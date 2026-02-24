@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VoiceTally</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      width: 320px;
+      padding: 15px;
+      background-color: #f9f9f9;
+    }
+    .status-bar {
+      font-size: 11px;
+      color: #666;
+      height: 18px; /* Fixed height to prevent layout jump */
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+    .input-group {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    #submitBtn {
+      background-color: #007bff;
+    }
+    #submitBtn:hover {
+      background-color: #0056b3;
+    }
+    
+    /* Microphone Button Styles */
+    #micBtn {
+      background-color: #6c757d;
+      width: 44px; /* Square target */
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Listening State Animation */
+    #micBtn.listening {
+      background-color: #dc3545; /* Red */
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    #output {
+      margin-top: 20px;
+      padding: 10px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      min-height: 40px;
+      font-size: 13px;
+      color: #555;
+      white-space: pre-wrap;
+    }
+    .error {
+      color: #d9534f;
+      border-color: #d9534f !important;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>VoiceTally</h2>
+
+  <div id="statusBar" class="status-bar"></div>
+
+  <div class="input-group">
+    <input type="text" id="queryInput" placeholder="Ask e.g., 'sales last week'..." maxlength="200">
+    <button id="micBtn" type="button" title="Speak Query">🎤</button>
+    <button id="submitBtn" type="button">Ask</button>
+  </div>
+
+  <div id="output">Results will appear here...</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
