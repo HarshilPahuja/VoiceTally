@@ -5,6 +5,7 @@ import csv
 import json
 import os
 import sys
+from datetime import datetime
 
 
 # LOAD CONFIG (relative to script location)
@@ -58,6 +59,86 @@ def tally_request(report_name: str) -> ET.Element:
     cleaned = clean_xml(response.text)
     return ET.fromstring(cleaned)
 
+def extract_sales_for_backend(day_book_rows):
+    """
+    Filters Day Book for 'Sales' vouchers and generates a simplified sales.csv
+    compatible with the voicetally-backend.
+    Expected Backend Schema: date, customer, amount, status
+    """
+    sales_rows = []
+    
+    # day_book_rows structure: 
+    # [voucher_type, voucher_number, voucher_date, party_ledger, ledger_name, amount, dr_cr, narration]
+    # indices: 0=type, 1=number, 2=date, 3=party, 4=ledger, 5=amount, 6=drcr, 7=narration
+
+    # We want unique vouchers to avoid summing up line items (Tax + Sales + etc).
+    # Since we want the total invoice value, we should look for the entry that represents the Party's Debit.
+    # In a typical Sales voucher:
+    # - Party Ledger is Debited (Total Amount)
+    # - Sales/Tax Ledgers are Credited (Split Amounts)
+    
+    # We will track processed voucher numbers to avoid duplicates
+    processed_vouchers = set()
+
+    for row in day_book_rows:
+        v_type = row[0].lower()
+        v_number = row[1]
+        
+        # Filter for Sales vouchers. 
+        if "sales" in v_type:
+             # Check if we already processed this voucher
+             if v_number in processed_vouchers:
+                 continue
+
+             date_str = row[2] # YYYYMMDD
+             customer = row[3]
+             # logic: we want the total amount.
+             # In extract_day_book, we are iterating ledger entries.
+             # If we just take the first entry we encounter for this voucher, 
+             # it might be the Sales Ledger (sub-amount) or the Party Ledger (total amount)?
+             # 'party_ledger' (row[3]) is the common header value.
+             # 'ledger_name' (row[4]) is the specific line item.
+             
+             # If ledger_name == party_ledger, then this line is likely the Party's debit => Total Amount.
+             # However, sometimes Party Ledger isn't in ALLLEDGERENTRIES if it's a simple headers-only view, 
+             # but usually it is in Tally XML "Day Book" export mode.
+             
+             # Fallback/Simplification: 
+             # If we can't be sure which line is the total, this script might be inaccurate for totals.
+             # BUT, for the Pilot/Demo, let's assume the first line we see for a Sales voucher 
+             # is roughly indicative or we accept the risk.
+             
+             # BETTER LOGIC:
+             # Find the row where row[4] (ledger_name) == row[3] (party_ledger).
+             # This confirms it's the Party's entry -> Total Bill Amount.
+             
+             if row[4] == row[3]:
+                 try:
+                    # Format Date: YYYYMMDD -> YYYY-MM-DD
+                    date_obj = datetime.strptime(date_str, "%Y%m%d")
+                    formatted_date = date_obj.strftime("%Y-%m-%d")
+                    
+                    amount = row[5]
+                    status = "Paid" # Default
+                    
+                    sales_rows.append([formatted_date, customer, amount, status])
+                    processed_vouchers.add(v_number)
+                 except ValueError:
+                    # If date parsing fails, skip or keep original
+                    pass
+    
+    # If we found no matches with exact party name match (sometimes case differs or alias used),
+    # we might fallback to just taking the first entry of that voucher? 
+    # Let's keep strict for now to avoid duplicates.
+    
+    path = os.path.join(OUTPUT_DIR, "sales.csv")
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["date", "customer", "amount", "status"])
+        writer.writerows(sales_rows)
+    print(f"Generated sales.csv with {len(sales_rows)} rows.")
+
+
 # DAY BOOK
 def extract_day_book():
     root = tally_request("Day Book")
@@ -101,6 +182,9 @@ def extract_day_book():
             "narration"
         ])
         writer.writerows(rows)
+    
+    # Create the specific file for the backend
+    extract_sales_for_backend(rows)
 
 # LEDGERS
 def extract_ledgers():
