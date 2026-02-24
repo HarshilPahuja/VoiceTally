@@ -60,7 +60,7 @@ Groups define:Asset / Liability / Income / Expense
 Note: The following Headers Can be changed by making changes in the script based on needs.
 
 day_book.csv
-    Headers
+    Headers-
         voucher_type,
         voucher_number,
         voucher_date,
@@ -70,13 +70,8 @@ day_book.csv
         dr_cr,
         narration
 
-    Notes: One voucher can produce multiple rows
-    ledger_name comes from ALLLEDGERENTRIES.LIST
-    dr_cr is derived from sign of amount
-
-
 ledgers.csv
-    Headers
+    Headers-
         ledger_name,
         parent_group,
         opening_balance,
@@ -85,14 +80,14 @@ ledgers.csv
         is_cost_center_on
 
 groups.csv
-    Headers
+    Headers-
         group_name,
         parent_group,
         primary_group,
         nature_of_group
 
 stock_items.csv
-    Headers
+    Headers-
         stock_item_name,
         stock_group,
         base_unit,
@@ -101,12 +96,12 @@ stock_items.csv
         gst_hsn_code
 
 stock_groups.csv
-    Headers
+    Headers-
         stock_group_name,
         parent_stock_group
 
 units.csv
-    Headers
+    Headers-
         unit_name,
         formal_name,
         decimal_places
