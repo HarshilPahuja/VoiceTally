@@ -128,12 +128,13 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
   const outputPath = inputPath + '.wav';
 
   try {
-    // Convert WebM (Opus) -> WAV (PCM 16kHz Mono for best results)
+    // Convert WebM (Opus) -> WAV (PCM 16kHz Mono, normalized volume)
     await new Promise((resolve, reject) => {
       ffmpeg(inputPath)
         .toFormat('wav')
         .audioFrequency(16000)
         .audioChannels(1)
+        .audioFilters('volume=4.0') // boost gain 4x to handle quiet microphones
         .on('end', resolve)
         .on('error', reject)
         .save(outputPath);
@@ -146,23 +147,43 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
     wav.fromBuffer(buffer);
 
     wav.toBitDepth('32f'); // Convert to 32-bit float
-    wav.toBitDepth('32f'); // Convert to 32-bit float
-    let audioData = wav.getSamples();
-
-    // Handle potential multi-channel output from wavefile (though we forced mono)
+    // getSamples: for mono returns Float32Array directly; for multi-channel returns array of Float32Arrays
+    let audioData = wav.getSamples(false, Float32Array);
     if (Array.isArray(audioData)) {
-      audioData = audioData[0];
+      audioData = audioData[0]; // take channel 0
+    }
+    // If still not Float32Array (e.g. returned as number[]), convert
+    if (!(audioData instanceof Float32Array)) {
+      audioData = Float32Array.from(audioData);
+    }
+
+    if (!audioData || audioData.length === 0) {
+      throw new Error('Audio data is empty after decoding');
     }
 
     // Run Transcription on Audio Data
+    console.log(`[STT] Audio samples: ${audioData.length}, duration: ~${(audioData.length/16000).toFixed(1)}s`);
+
+    // Normalize audio to [-1, 1] so Whisper can hear quiet mic input
+    let maxAmp = 0;
+    for (let i = 0; i < audioData.length; i++) {
+      if (Math.abs(audioData[i]) > maxAmp) maxAmp = Math.abs(audioData[i]);
+    }
+    console.log(`[STT] Peak amplitude: ${maxAmp.toFixed(4)}`);
+    if (maxAmp > 0 && maxAmp < 0.1) {
+      // Audio is very quiet — boost it
+      const boost = 0.9 / maxAmp;
+      for (let i = 0; i < audioData.length; i++) audioData[i] *= boost;
+      console.log(`[STT] Boosted audio by ${boost.toFixed(1)}x`);
+    }
+
     const output = await transcriber(audioData, {
-      chunk_length_s: 30,
-      stride_length_s: 5,
       language: 'english',
       task: 'transcribe',
     });
 
-    const text = output.text.trim().replace(/\[.*?\]/g, '');
+    console.log(`[STT] Raw output:`, JSON.stringify(output));
+    const text = (output.text || '').trim().replace(/\[.*?\]/g, '').trim();
     console.log(`[STT] Transcribed: "${text}"`);
 
     // Cleanup
@@ -174,10 +195,10 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
   } catch (err) {
     console.error("[STT] Error:", err);
     // Cleanup on error
-    if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
-    if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+    try { if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath); } catch (_) {}
+    try { if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath); } catch (_) {}
 
-    res.status(500).json({ error: "Transcription failed." });
+    res.status(500).json({ error: "Transcription failed.", detail: err.message });
   }
 });
 
