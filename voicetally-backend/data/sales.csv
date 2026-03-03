@@ -1,3 +1,11 @@
 date,customer,amount,status
 2023-10-01,Customer A,1180.0,Paid
-2023-10-05,Customer B,500.0,Paid
+2023-10-05,Customer B,500.0,Processing
+2023-10-05,Customer C,600.0,Unpaid
+2023-10-05,Customer D,658.0,Processing
+2023-10-05,Customer E,740.0,Paid
+2023-10-05,Customer F,1120.0,Unpaid
+2023-10-05,Customer G,1550.0,Paid
+2023-10-05,Customer H,909.0,Unpaid
+2023-10-05,Customer I,980.0,Paid
+2023-10-05,Customer J,100.0,Paid
