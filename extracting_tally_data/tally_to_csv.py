@@ -33,31 +33,35 @@ def clean_xml(raw_xml: str) -> str:
     return raw_xml
 
 def tally_request(report_name: str) -> ET.Element:
-    xml = f"""
-    <ENVELOPE>
-      <HEADER>
-        <TALLYREQUEST>Export Data</TALLYREQUEST>
-      </HEADER>
-      <BODY>
-        <EXPORTDATA>
-          <REQUESTDESC>
-            <REPORTNAME>{report_name}</REPORTNAME>
-            <STATICVARIABLES>
-              <SVCURRENTCOMPANY>{COMPANY_NAME}</SVCURRENTCOMPANY>
-              <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
-            </STATICVARIABLES>
-          </REQUESTDESC>
-        </EXPORTDATA>
-      </BODY>
-    </ENVELOPE>
-    """
-
-    response = requests.post(TALLY_URL, data=xml, timeout=15)
-    if response.status_code != 200:
-        raise Exception(f"Tally returned status {response.status_code}")
-
-    cleaned = clean_xml(response.text)
-    return ET.fromstring(cleaned)
+        xml = f"""
+        <ENVELOPE>
+            <HEADER>
+                <TALLYREQUEST>Export Data</TALLYREQUEST>
+            </HEADER>
+            <BODY>
+                <EXPORTDATA>
+                    <REQUESTDESC>
+                        <REPORTNAME>{report_name}</REPORTNAME>
+                        <STATICVARIABLES>
+                            <SVCURRENTCOMPANY>{COMPANY_NAME}</SVCURRENTCOMPANY>
+                            <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                        </STATICVARIABLES>
+                    </REQUESTDESC>
+                </EXPORTDATA>
+            </BODY>
+        </ENVELOPE>
+        """
+        try:
+                response = requests.post(TALLY_URL, data=xml, timeout=15)
+                response.raise_for_status()
+                cleaned = clean_xml(response.text)
+                return ET.fromstring(cleaned)
+        except requests.ConnectionError:
+                print("[ERROR] Could not connect to Tally at", TALLY_URL)
+                sys.exit(1)
+        except Exception as e:
+                print(f"[ERROR] Tally request failed: {e}")
+                sys.exit(1)
 
 def extract_sales_for_backend(day_book_rows):
     """
@@ -309,15 +313,32 @@ def extract_units():
         writer.writerows(rows)
 
 # MAIN
+# MAIN
+
+def _test_extract_sales_for_backend():
+    # Simple test for extraction logic
+    dummy_rows = [
+        ["Sales", "V1", "20231001", "Customer A", "Customer A", 1180.0, "DR", "Sold items"],
+        ["Sales", "V1", "20231001", "Customer A", "Sales Account", 1000.0, "CR", "Sold items"],
+        ["Sales", "V1", "20231001", "Customer A", "GST Output", 180.0, "CR", "Sold items"],
+        ["Receipt", "V2", "20231002", "Customer A", "Cash", 1180.0, "DR", "Payment received"],
+        ["Sales", "V3", "20231005", "Customer B", "Customer B", 500.0, "DR", "Small sale"],
+    ]
+    extract_sales_for_backend(dummy_rows)
+    print("[TEST] sales.csv generated for test data.")
+
 if __name__ == "__main__":
     print(f"Extracting data for company: {COMPANY_NAME}")
-
-    extract_groups()
-    extract_ledgers()
-    extract_stock_groups()
-    extract_stock_items()
-    extract_units()
-    extract_day_book()
-
-    print("Extraction completed successfully")
-    print(f"CSVs generated in: {OUTPUT_DIR}")
+    try:
+        extract_groups()
+        extract_ledgers()
+        extract_stock_groups()
+        extract_stock_items()
+        extract_units()
+        extract_day_book()
+        print("Extraction completed successfully")
+        print(f"CSVs generated in: {OUTPUT_DIR}")
+    except Exception as e:
+        print(f"[FATAL] Extraction failed: {e}")
+    # Run test
+    _test_extract_sales_for_backend()

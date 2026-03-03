@@ -5,8 +5,8 @@ const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT;
-const HOST = process.env.HOST; // STRICT: Localhost only
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '127.0.0.1'; // STRICT: Localhost only
 
 const multer = require('multer');
 const { pipeline } = require('@xenova/transformers');
@@ -62,7 +62,7 @@ const VALID_PERIODS = ['week', 'month', 'year'];
 
 // 1. Health Check
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', uptime: process.uptime() });
+  res.status(200).json({ status: 'ok', uptime: process.uptime(), env: { PORT, HOST } });
 });
 
 // 2. Sales Data Endpoint
@@ -70,50 +70,51 @@ const { getSales } = require('./file_ingestion');
 
 // 2. Sales Data Endpoint
 app.get('/sales', async (req, res) => {
-  // Input Validation
-  const { period, customer, status, from, to } = req.query;
-
-  // Strict Parameter Validation for PERIOD only if it exists
-  if (period && !VALID_PERIODS.includes(period)) {
-    return res.status(400).json({
-      error: "Invalid Parameter",
-      message: `Period must be one of: ${VALID_PERIODS.join(', ')}`
-    });
-  }
-
-  // Check for unexpected parameters (Whitelisting approach)
-  // Expanded whitelist for robust queries
-  const allowedKeys = ['period', 'customer', 'status', 'from', 'to'];
-  const queryKeys = Object.keys(req.query);
-  const invalidKeys = queryKeys.filter(key => !allowedKeys.includes(key));
-
-  if (invalidKeys.length > 0) {
-    return res.status(400).json({
-      error: "Bad Request",
-      message: `Unknown parameters: ${invalidKeys.join(', ')}`
-    });
-  }
-
   try {
-    // Pass all checks
-    const data = await getSales({ period, customer, status, from, to });
+    const { period, customer, status, from, to } = req.query;
+    // Strict Parameter Validation for PERIOD only if it exists
+    if (period && !VALID_PERIODS.includes(period)) {
+      return res.status(400).json({
+        error: "Invalid Parameter",
+        message: `Period must be one of: ${VALID_PERIODS.join(', ')}`
+      });
+    }
+    // Check for unexpected parameters (Whitelisting approach)
+    const allowedKeys = ['period', 'customer', 'status', 'from', 'to'];
+    const queryKeys = Object.keys(req.query);
+    const invalidKeys = queryKeys.filter(key => !allowedKeys.includes(key));
+    if (invalidKeys.length > 0) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: `Unknown parameters: ${invalidKeys.join(', ')}`
+      });
+    }
+    // Sanitize input
+    const safe = str => typeof str === 'string' ? str.replace(/[^\w\s\-@.]/g, '') : str;
+    const data = await getSales({
+      period: safe(period),
+      customer: safe(customer),
+      status: safe(status),
+      from: safe(from),
+      to: safe(to)
+    });
     res.json(data);
   } catch (err) {
-    console.error("Data Fetch Error:", err);
-    res.status(500).json({ error: "Failed to load data." });
+    console.error("[ERROR] /sales Data Fetch Error:", err);
+    res.status(500).json({ error: "Failed to load data.", details: err.message });
   }
 });
 
 // --- GLOBAL ERROR HANDLER ---
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Internal Server Error" });
+  console.error("[FATAL ERROR]", err.stack);
+  res.status(500).json({ error: "Internal Server Error", details: err.message });
 });
 
 // --- START SERVER ---
 app.listen(PORT, HOST, () => {
   console.log(`[VoiceTally-Backend] Securely running at http://${HOST}:${PORT}`);
-  console.log(`[Security] Rate Limit: ${process.env.RATE_LIMIT_MAX_REQ} reqs / ${process.env.RATE_LIMIT_WINDOW_MIN} min`);
+  console.log(`[Security] Rate Limit: ${process.env.RATE_LIMIT_MAX_REQ || 100} reqs / ${process.env.RATE_LIMIT_WINDOW_MIN || 1} min`);
 });
 
 // --- STT ENDPOINT (Local Whisper) ---

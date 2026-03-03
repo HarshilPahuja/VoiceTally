@@ -125,40 +125,65 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- CORE QUERY PIPELINE (Reused) ---
+
   function handleQuery() {
     const query = input.value.trim();
-
-    // Clear status
     output.classList.remove('error');
     output.style.borderColor = "#ddd";
-
-    // 1. Validation (Applies to both Voice and Type)
-    if (!query) return; // Ignore empty inputs
-
+    // Input validation
+    if (!query) {
+      showOutput("Please enter a query.", "error");
+      return;
+    }
     if (query.length > 200) {
       showOutput("Error: Query too long (max 200 chars).", "error");
       return;
     }
-
-    // 2. Processing
     statusBar.textContent = "";
     showOutput("Asking Tally...", "neutral");
-
     chrome.runtime.sendMessage({ type: 'QUERY_TALLY', payload: query }, (response) => {
       if (chrome.runtime.lastError) {
         showOutput("System Error: " + chrome.runtime.lastError.message, "error");
         return;
       }
-
       if (response && response.success) {
-        // Pretty print JSON response
-        output.textContent = JSON.stringify(response.data, null, 2);
-        output.style.borderColor = "#28a745";
-        output.style.color = "#333";
+        // Format sales data if present
+        if (response.data && response.data.detailed_records) {
+          output.innerHTML = renderSalesTable(response.data);
+          output.style.borderColor = "#28a745";
+          output.style.color = "#333";
+        } else {
+          output.textContent = JSON.stringify(response.data, null, 2);
+          output.style.borderColor = "#28a745";
+          output.style.color = "#333";
+        }
       } else {
         showOutput(response ? response.error : "Unknown error.", "error");
       }
     });
+  }
+
+  function renderSalesTable(data) {
+    let html = `<div><b>Total: ₹${data.total || 0}</b> | <b>Transactions:</b> ${data.transaction_count || 0}</div>`;
+    if (data.breakdown) {
+      html += `<div style='margin-bottom:8px;'>`;
+      for (const [status, count] of Object.entries(data.breakdown)) {
+        html += `<span style='margin-right:10px;'><b>${status}:</b> ${count}</span>`;
+      }
+      html += `</div>`;
+    }
+    if (data.detailed_records && data.detailed_records.length) {
+      html += `<table style='width:100%;border-collapse:collapse;font-size:12px;'>`;
+      html += `<tr><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th></tr>`;
+      for (const rec of data.detailed_records.slice(0, 10)) {
+        html += `<tr><td>${rec.date ? rec.date.split('T')[0] : ''}</td><td>${rec.customer}</td><td>₹${rec.amount}</td><td>${rec.status}</td></tr>`;
+      }
+      html += `</table>`;
+      if (data.detailed_records.length > 10) {
+        html += `<div style='font-size:11px;color:#888;'>Showing first 10 of ${data.detailed_records.length} records.</div>`;
+      }
+    }
+    return html;
   }
 
   function showOutput(msg, type) {
