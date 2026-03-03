@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>VoiceTally | Admin Panel</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --bg: #F9FAFB;
+            --surface: #FFFFFF;
+            --sidebar: #111827;
+            --sidebar-text: #D1D5DB;
+            --sidebar-hover: #1F2937;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar);
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 24px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid #374151;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-items {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 12px 24px;
+            display: block;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: white;
+            border-left: 4px solid #818CF8;
+        }
+
+        .logout-btn {
+            padding: 20px 24px;
+            border-top: 1px solid #374151;
+            color: var(--sidebar-text);
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .logout-btn:hover {
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .topbar {
+            height: 64px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .content-area {
+            padding: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Cards & Panels */
+        .panel {
+            background: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            background: #F9FAFB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-body {
+            padding: 24px;
+        }
+
+        /* Data Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            padding: 12px 24px;
+            background: #F9FAFB;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        /* Controls */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #F3F4F6;
+        }
+
+        .btn-danger {
+            color: var(--danger);
+            border-color: #FCA5A5;
+            background: #FEF2F2;
+        }
+
+        .btn-danger:hover {
+            background: #FEE2E2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Ensure user is logged in as Admin -->
+    <script>
+        const token = sessionStorage.getItem('vt_token');
+        const role = sessionStorage.getItem('vt_role');
+
+        if (!token || role !== 'admin') {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <div class="sidebar">
+        <div class="brand">
+            📊 VoiceTally Admin
+        </div>
+        <div class="nav-items">
+            <a href="#" class="nav-item">Dashboard</a>
+            <a href="#" class="nav-item active">Audit Logs</a>
+            <a href="#" class="nav-item">Rate Limit Tuning</a>
+            <a href="#" class="nav-item">Connectors</a>
+        </div>
+        <div class="logout-btn" onclick="logout()">
+            ↩ Sign Out
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="page-title">System Audit & Settings</div>
+            <div class="user-profile">Logged in as <strong>Admin</strong></div>
+        </div>
+
+        <div class="content-area">
+            <!-- Rate Limit Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    Global Security Controls
+                </div>
+                <!-- Form container -->
+                <div class="panel-body" style="display: flex; gap: 24px;">
+                    <div>
+                        <label
+                            style="display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">API
+                            Rate Limit (Req / min)</label>
+                        <input type="number" id="rateLimitMax" value="100"
+                            style="padding: 8px; border: 1px solid var(--border); border-radius: 4px; width: 120px;">
+                    </div>
+                    <div>
+                        <label
+                            style="display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Window
+                            Size
+                            (Minutes)</label>
+                        <input type="number" id="rateLimitWindow" value="1"
+                            style="padding: 8px; border: 1px solid var(--border); border-radius: 4px; width: 120px;">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="btn" id="applyConfigBtn">Apply Changes</button>
+                    </div>
+                </div>
+                <!-- Status feedback message -->
+                <div id="configStatus" style="padding: 0 24px 16px; font-size: 13px;"></div>
+            </div>
+
+            <!-- Audit Logs Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    Recent Extension Activity (Audit Log)
+                    <button class="btn">Export CSV</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User ID</th>
+                            <th>Action / Event</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <!-- Mock Data Generated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const tbody = document.getElementById('auditTableBody');
+
+        async function fetchAuditLogs() {
+            try {
+                const res = await fetch('http://127.0.0.1:3000/api/admin/audit-logs', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) logout();
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger);">${data.error || 'Failed to load logs'}</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                if (data.logs && data.logs.length > 0) {
+                    data.logs.forEach(log => {
+                        const isBlocked = log.status === 'Blocked' || log.status === 'Error';
+                        const row = `
+                        <tr>
+                        <td><span style="color: var(--text-muted); font-size: 13px;">${new Date(log.time).toLocaleString()}</span></td>
+                        <td style="font-family: monospace;">${log.user}</td>
+                        <td>${log.action}</td>
+                        <td><span class="badge ${isBlocked ? 'badge-warning' : 'badge-success'}">${log.status}</span></td>
+                        <td>
+                            <button class="btn" style="padding: 4px 8px; font-size: 11px;">Inspect</button>
+                            ${isBlocked ? '<button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px; margin-left: 4px;">Ban IP</button>' : ''}
+                        </td>
+                        </tr>
+                    `;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No recent audit logs found.</td></tr>`;
+                }
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger);">Backend connection error.</td></tr>`;
+            }
+        }
+
+        document.getElementById('applyConfigBtn').addEventListener('click', async () => {
+            const max = document.getElementById('rateLimitMax').value;
+            const windowMin = document.getElementById('rateLimitWindow').value;
+            const statusDiv = document.getElementById('configStatus');
+            const btn = document.getElementById('applyConfigBtn');
+
+            btn.disabled = true;
+            statusDiv.textContent = 'Saving...';
+            statusDiv.style.color = 'var(--text-muted)';
+
+            try {
+                const res = await fetch('http://127.0.0.1:3000/api/admin/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ max, windowMin })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    statusDiv.textContent = 'Rate limit configuration updated securely.';
+                    statusDiv.style.color = 'var(--primary)';
+                    fetchAuditLogs(); // Refresh logs to see the config update
+                } else {
+                    statusDiv.textContent = data.error || 'Failed to update configuration.';
+                    statusDiv.style.color = 'var(--danger)';
+                }
+            } catch (err) {
+                statusDiv.textContent = 'Backend connection error.';
+                statusDiv.style.color = 'var(--danger)';
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Initialize view
+        fetchAuditLogs();
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

@@ -3,6 +3,7 @@ const path = require('path');
 const csv = require('csv-parser');
 const xml2js = require('xml2js');
 const { parse, isValid, parseISO } = require('date-fns');
+const logger = require('./logger');
 
 // Store data in memory
 let cachedSales = [];
@@ -67,7 +68,7 @@ async function loadData() {
     // For safety, just load.
 
     if (!fs.existsSync(DATA_FILE_PATH)) {
-        console.warn(`[Data] File not found: ${DATA_FILE_PATH}`);
+        logger.warn(`[Data] File not found: ${DATA_FILE_PATH}`);
         return [];
     }
 
@@ -96,7 +97,7 @@ async function loadData() {
         // Need to traverse `result` to find rows.
         // Mocking structure traversal...
         // For MVP, if XML is unsupported structure, return empty.
-        console.log("XML parsing implemented but structure dependent.");
+        logger.info("XML parsing implemented but structure dependent.");
         return [];
     }
 

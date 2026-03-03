@@ -1,6 +1,23 @@
 # VoiceTally Extension Changelog's
 
 ---
+Log Date: 04-03-2026
+
+### Changes/Audit
+
+1. **server.js:** added Winston for logging.
+
+2. **logger.js:** Created a custom logging utility using Winston that formats messages nicely with timestamps.
+
+3. Dual Transports: It is configured to output colorized logs to your development console, while simultaneously appending all logs to voicetally-backend/backend.log as requested.
+
+4. Request Middleware: Added a global middleware in server.js that automatically logs every incoming request and its outcome status (e.g. Incoming request: GET /sales... and Request succeeded: ... Status: 200).
+
+5. Converted Statements: ```server.js``` and ```file_ingestion.js```, upgraded all existing *console.log* and *console.error* calls to use the proper *logger.info*, *logger.warn*, or *logger.error* methods with stack traces for errors.
+
+6. Dashboard: Added a dashboard to display the total sales, average sales, and status breakdown.
+note: Dashboard is not ready, it is under development and open/access by opening it manually(login required, id & pass already shown).
+---
 
 Log Date: 11-02-2026
 

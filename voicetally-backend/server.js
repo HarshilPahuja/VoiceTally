@@ -3,8 +3,27 @@ const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const logger = require('./logger');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_dev_key_only_123';
 
 const app = express();
+
+// --- REQUEST LOGGING MIDDLEWARE ---
+app.use((req, res, next) => {
+  logger.info(`Incoming request: ${req.method} ${req.originalUrl} from ${req.ip}`);
+  res.on('finish', () => {
+    if (res.statusCode >= 400) {
+      logger.warn(`Request failed: ${req.method} ${req.originalUrl} - Status: ${res.statusCode}`);
+    } else {
+      logger.info(`Request succeeded: ${req.method} ${req.originalUrl} - Status: ${res.statusCode}`);
+    }
+  });
+  next();
+});
+
+app.use(express.json()); // Allow JSON body parsing for auth routes
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '127.0.0.1'; // STRICT: Localhost only
 
@@ -21,11 +40,11 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 let transcriber = null;
 (async () => {
   try {
-    console.log("[STT] Loading Whisper model (Xenova/whisper-tiny.en)...");
+    logger.info("[STT] Loading Whisper model (Xenova/whisper-tiny.en)...");
     transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en');
-    console.log("[STT] Model loaded successfully.");
+    logger.info("[STT] Model loaded successfully.");
   } catch (err) {
-    console.error("[STT] Failed to load model:", err);
+    logger.error(`[STT] Failed to load model: ${err.message}`, err);
   }
 })();
 
@@ -58,7 +77,68 @@ app.use(limiter);
 // --- VALIDATION HELPER ---
 const VALID_PERIODS = ['week', 'month', 'year'];
 
+// --- MOCK DATABASE ---
+const mockUsers = [
+  { id: 1, email: 'admin@example.com', password: 'password', role: 'admin' },
+  { id: 2, email: 'user@example.com', password: 'password', role: 'user' }
+];
+
+let globalRateLimitConfig = { max: 100, windowMin: 1 };
+const auditLogs = [];
+
+function addAuditLog(userId, action, status) {
+  auditLogs.unshift({
+    time: new Date().toISOString(),
+    user: userId,
+    action,
+    status
+  });
+  if (auditLogs.length > 1000) auditLogs.pop(); // Keep array bounded
+}
+
+// --- AUTHENTICATION MIDDLEWARE ---
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: "Access denied. Token missing." });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: "Invalid or expired token." });
+    req.user = user;
+    next();
+  });
+};
+
+const requireAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: "Access denied. Admins only." });
+  }
+  next();
+};
+
 // --- ROUTES ---
+
+// 0. Authentication Route
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: "Email and password required." });
+
+  const user = mockUsers.find(u => u.email === email && u.password === password);
+  if (!user) {
+    addAuditLog('Anonymous', `Failed Login Attempt: ${email}`, 'Blocked');
+    return res.status(401).json({ error: "Invalid credentials." });
+  }
+
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    JWT_SECRET,
+    { expiresIn: '8h' }
+  );
+
+  addAuditLog(user.email, 'Logged In', 'Success');
+  res.json({ success: true, token, role: user.role });
+});
 
 // 1. Health Check
 app.get('/health', (req, res) => {
@@ -70,10 +150,12 @@ const { getSales } = require('./file_ingestion');
 
 // 2. Sales Data Endpoint
 app.get('/sales', async (req, res) => {
+  let userId = 'ExtensionUser'; // Default tracking for proxy users
   try {
     const { period, customer, status, from, to } = req.query;
     // Strict Parameter Validation for PERIOD only if it exists
     if (period && !VALID_PERIODS.includes(period)) {
+      addAuditLog(userId, 'Sales Query Failed - Invalid Period', 'Blocked');
       return res.status(400).json({
         error: "Invalid Parameter",
         message: `Period must be one of: ${VALID_PERIODS.join(', ')}`
@@ -84,6 +166,7 @@ app.get('/sales', async (req, res) => {
     const queryKeys = Object.keys(req.query);
     const invalidKeys = queryKeys.filter(key => !allowedKeys.includes(key));
     if (invalidKeys.length > 0) {
+      addAuditLog(userId, `Sales Query Failed - Unknown Params: ${invalidKeys.join(',')}`, 'Blocked');
       return res.status(400).json({
         error: "Bad Request",
         message: `Unknown parameters: ${invalidKeys.join(', ')}`
@@ -91,30 +174,58 @@ app.get('/sales', async (req, res) => {
     }
     // Sanitize input
     const safe = str => typeof str === 'string' ? str.replace(/[^\w\s\-@.]/g, '') : str;
-    const data = await getSales({
+    const cleanParams = {
       period: safe(period),
       customer: safe(customer),
       status: safe(status),
       from: safe(from),
       to: safe(to)
-    });
+    };
+
+    addAuditLog(userId, `Requested Sales Data: ${JSON.stringify(cleanParams)}`, 'Success');
+    const data = await getSales(cleanParams);
     res.json(data);
   } catch (err) {
-    console.error("[ERROR] /sales Data Fetch Error:", err);
+    logger.error(`[ERROR] /sales Data Fetch Error: ${err.message}`, err);
+    addAuditLog(userId, `Sales Query Error`, 'Error');
     res.status(500).json({ error: "Failed to load data.", details: err.message });
   }
 });
 
+// 3. User History (Mocked for dashboard example)
+app.get('/api/user/history', authenticateToken, (req, res) => {
+  // Fetch logs specifically for this verified user's email
+  const userLogs = auditLogs.filter(log => log.user === req.user.email).slice(0, 10);
+  res.json({ success: true, history: userLogs });
+});
+
+// 4. Admin Audit Logs
+app.get('/api/admin/audit-logs', authenticateToken, requireAdmin, (req, res) => {
+  res.json({ success: true, logs: auditLogs });
+});
+
+// 5. Admin Config Tweak (Example endpoint)
+app.post('/api/admin/config', authenticateToken, requireAdmin, (req, res) => {
+  const { max, windowMin } = req.body;
+  if (!max || !windowMin) return res.status(400).json({ error: "Missing config parameters." });
+
+  globalRateLimitConfig.max = parseInt(max, 10);
+  globalRateLimitConfig.windowMin = parseInt(windowMin, 10);
+
+  addAuditLog(req.user.email, `Updated Global Rate Limit: ${max} req/${windowMin}m`, 'Success');
+  res.json({ success: true, config: globalRateLimitConfig });
+});
+
 // --- GLOBAL ERROR HANDLER ---
 app.use((err, req, res, next) => {
-  console.error("[FATAL ERROR]", err.stack);
+  logger.error(`[FATAL ERROR] ${err.message}`, err);
   res.status(500).json({ error: "Internal Server Error", details: err.message });
 });
 
 // --- START SERVER ---
 app.listen(PORT, HOST, () => {
-  console.log(`[VoiceTally-Backend] Securely running at http://${HOST}:${PORT}`);
-  console.log(`[Security] Rate Limit: ${process.env.RATE_LIMIT_MAX_REQ || 100} reqs / ${process.env.RATE_LIMIT_WINDOW_MIN || 1} min`);
+  logger.info(`[VoiceTally-Backend] Securely running at http://${HOST}:${PORT}`);
+  logger.info(`[Security] Rate Limit: ${process.env.RATE_LIMIT_MAX_REQ || 100} reqs / ${process.env.RATE_LIMIT_WINDOW_MIN || 1} min`);
 });
 
 // --- STT ENDPOINT (Local Whisper) ---
@@ -162,19 +273,19 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
     }
 
     // Run Transcription on Audio Data
-    console.log(`[STT] Audio samples: ${audioData.length}, duration: ~${(audioData.length/16000).toFixed(1)}s`);
+    logger.info(`[STT] Audio samples: ${audioData.length}, duration: ~${(audioData.length / 16000).toFixed(1)}s`);
 
     // Normalize audio to [-1, 1] so Whisper can hear quiet mic input
     let maxAmp = 0;
     for (let i = 0; i < audioData.length; i++) {
       if (Math.abs(audioData[i]) > maxAmp) maxAmp = Math.abs(audioData[i]);
     }
-    console.log(`[STT] Peak amplitude: ${maxAmp.toFixed(4)}`);
+    logger.info(`[STT] Peak amplitude: ${maxAmp.toFixed(4)}`);
     if (maxAmp > 0 && maxAmp < 0.1) {
       // Audio is very quiet — boost it
       const boost = 0.9 / maxAmp;
       for (let i = 0; i < audioData.length; i++) audioData[i] *= boost;
-      console.log(`[STT] Boosted audio by ${boost.toFixed(1)}x`);
+      logger.info(`[STT] Boosted audio by ${boost.toFixed(1)}x`);
     }
 
     const output = await transcriber(audioData, {
@@ -182,9 +293,9 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
       task: 'transcribe',
     });
 
-    console.log(`[STT] Raw output:`, JSON.stringify(output));
+    logger.debug(`[STT] Raw output: ${JSON.stringify(output)}`);
     const text = (output.text || '').trim().replace(/\[.*?\]/g, '').trim();
-    console.log(`[STT] Transcribed: "${text}"`);
+    logger.info(`[STT] Transcribed: "${text}"`);
 
     // Cleanup
     if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
@@ -193,10 +304,10 @@ app.post('/transcribe', upload.single('audio'), async (req, res) => {
     res.json({ success: true, text: text });
 
   } catch (err) {
-    console.error("[STT] Error:", err);
+    logger.error(`[STT] Error: ${err.message}`, err);
     // Cleanup on error
-    try { if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath); } catch (_) {}
-    try { if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath); } catch (_) {}
+    try { if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath); } catch (_) { }
+    try { if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath); } catch (_) { }
 
     res.status(500).json({ error: "Transcription failed.", detail: err.message });
   }

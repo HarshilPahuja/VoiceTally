@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>VoiceTally | Dashboard</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --bg: #F9FAFB;
+            --surface: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+        }
+
+        .topbar {
+            background: var(--surface);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            margin-left: 24px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-logout:hover {
+            background: #F3F4F6;
+        }
+
+        .content-area {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-card {
+            background: var(--surface);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .welcome-card h1 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+        }
+
+        .welcome-card p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        #adminLink {
+            display: none;
+            /* Hidden by default; JS enables it if admin */
+            color: #7C3AED;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Ensure user is logged in -->
+    <script>
+        const token = sessionStorage.getItem('vt_token');
+        const role = sessionStorage.getItem('vt_role');
+
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <div class="topbar">
+        <div class="brand">
+            📊 VoiceTally
+        </div>
+        <div class="nav-links">
+            <a href="#">Overview</a>
+            <a href="#">Recent Queries</a>
+            <a href="#">Reports</a>
+            <a href="admin.html" id="adminLink">Admin Panel</a>
+        </div>
+        <div class="user-menu">
+            <span id="userEmail">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="content-area">
+        <div class="welcome-card">
+            <h1 id="greeting">Welcome to VoiceTally!</h1>
+            <p>Use the Chrome Extension to start querying your data. Your history and generated reports will appear
+                here.</p>
+        </div>
+
+        <div id="historyContainer" style="margin-top: 32px;">
+            <h3 style="margin-bottom: 16px;">Recent Query History</h3>
+            <div id="historyList"
+                style="background: var(--surface); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                Loading history...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bind UI based on Session Storage role
+        if (role === 'admin') {
+            document.getElementById('adminLink').style.display = 'inline-block';
+            document.getElementById('userEmail').textContent = 'Admin User';
+            document.getElementById('greeting').textContent = 'Welcome back, Admin!';
+        } else {
+            document.getElementById('userEmail').textContent = 'Standard User';
+        }
+
+        async function fetchHistory() {
+            try {
+                const res = await fetch('http://127.0.0.1:3000/api/user/history', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) logout(); // Token expired or invalid
+                    document.getElementById('historyList').innerHTML = `<span style="color:var(--error)">${data.error || 'Failed to load history.'}</span>`;
+                    return;
+                }
+
+                if (data.history && data.history.length > 0) {
+                    let html = '<table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px;">';
+                    html += '<tr style="border-bottom: 1px solid var(--border);"><th style="padding:8px">Time</th><th style="padding:8px">Action</th><th style="padding:8px">Status</th></tr>';
+                    data.history.forEach(log => {
+                        html += `<tr>
+                            <td style="padding:8px">${new Date(log.time).toLocaleString()}</td>
+                            <td style="padding:8px">${log.action}</td>
+                            <td style="padding:8px">${log.status}</td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    document.getElementById('historyList').innerHTML = html;
+                } else {
+                    document.getElementById('historyList').textContent = 'No recent history found.';
+                }
+            } catch (err) {
+                document.getElementById('historyList').innerHTML = `<span style="color:var(--error)">Backend connection error.</span>`;
+            }
+        }
+
+        fetchHistory();
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+    </script>
+
+</body>
+
+</html>

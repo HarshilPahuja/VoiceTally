@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const micBtn = document.getElementById('micBtn');
   const output = document.getElementById('output');
   const statusBar = document.getElementById('statusBar');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const dashboardBtn = document.getElementById('dashboardBtn');
 
   // --- STANDARD EVENT LISTENERS ---
   submitBtn.addEventListener('click', handleQuery);
@@ -13,6 +15,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Focus input on load
   input.focus();
+
+  // --- HEADER ACTIONS ---
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+      if (chrome.runtime && chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+      } else {
+        window.open('options.html', '_blank');
+      }
+    });
+  }
+
+  if (dashboardBtn) {
+    dashboardBtn.addEventListener('click', () => {
+      // Assuming the dashboard is accessible via the local server or deployed URL
+      // Since it's currently stored in the parent 'dashboard' folder, we'll link to it.
+      // In a real extension, you either bundle the dashboard or host it. 
+      // For now, bridging to the local URL or file path might be tricky, let's assume it's hosted or local:
+      window.open('http://127.0.0.1:5500/dashboard/login.html', '_blank'); // Adjust for Live Server or production domain
+    });
+  }
 
   // --- UI HELPERS ---
   function updateStatus(msg, statusType = 'neutral') {
@@ -282,6 +305,48 @@ document.addEventListener('DOMContentLoaded', () => {
       // Security enforcement: block unauthorized web fetch.
       updateStatus("Not running in extension context.", "error");
       showOutput("Security Error: VoiceTally must be run as a Chrome Extension. Standalone execution is disabled.", "error");
+      // Standalone mode: direct fetch to backend
+      // Only supports sales queries for demo
+      let endpoint = '';
+      const normalizedQuery = query.toLowerCase().trim();
+      if (normalizedQuery.includes('sales') || normalizedQuery.includes('sells') || normalizedQuery.includes('revenue')) {
+        endpoint = '/sales?';
+        const params = new URLSearchParams();
+        if (normalizedQuery.includes('last week')) params.append('period', 'week');
+        else if (normalizedQuery.includes('last month')) params.append('period', 'month');
+        else if (normalizedQuery.includes('last year')) params.append('period', 'year');
+        if (normalizedQuery.includes('pending') || normalizedQuery.includes('unpaid')) params.append('status', 'pending');
+        else if (normalizedQuery.includes('paid')) params.append('status', 'paid');
+        const customerMatch = normalizedQuery.match(/for\s+(?:customer\s+|client\s+)?([a-z0-9\s]+)/i);
+        if (customerMatch && customerMatch[1]) {
+          let custName = customerMatch[1].trim();
+          const stopWords = [' last', ' today', ' yesterday', ' from'];
+          stopWords.forEach(sw => {
+            if (custName.includes(sw)) custName = custName.split(sw)[0];
+          });
+          params.append('customer', custName);
+        }
+        endpoint += params.toString();
+      } else {
+        showOutput("Only sales queries are supported in local mode.", "error");
+        return;
+      }
+      fetch(`http://127.0.0.1:3000${endpoint}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.detailed_records) {
+            output.innerHTML = renderSalesTable(data);
+            output.style.borderColor = "#28a745";
+            output.style.color = "#333";
+          } else {
+            output.textContent = JSON.stringify(data, null, 2);
+            output.style.borderColor = "#28a745";
+            output.style.color = "#333";
+          }
+        })
+        .catch(err => {
+          showOutput("Backend Error: " + err, "error");
+        });
     }
   }
 });
