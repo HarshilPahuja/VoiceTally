@@ -1,6 +1,22 @@
 # VoiceTally Extension Changelog's
 
 ---
+
+Log Date: 04-03-2026 Time: 19:55
+
+### Changes/Audit
+
+1. **background.js:** improved logging added.
+2. **popup.js:** logging added and.
+3. **admin.html:** now working and opens from extension popup
+4. **admin.js:** javascript for ```admin.js``` is placed here and now working.
+5. **index.html:** now working and opens from extension popup
+6. **index.js:** javascript for ```index.js``` is placed here and now working.
+7. **login.html:** now working and opens from extension popup
+8. **login.js:** javascript for ```login.js``` is placed here and now working.
+
+---
+
 Log Date: 04-03-2026
 
 ### Changes/Audit
@@ -17,6 +33,7 @@ Log Date: 04-03-2026
 
 6. Dashboard: Added a dashboard to display the total sales, average sales, and status breakdown.
 note: Dashboard is not ready, it is under development and open/access by opening it manually(login required, id & pass already shown).
+
 ---
 
 Log Date: 11-02-2026

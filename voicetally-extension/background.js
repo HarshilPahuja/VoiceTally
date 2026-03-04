@@ -52,30 +52,38 @@ chrome.runtime.onInstalled.addListener((details) => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.info(`[Background] Received message: ${message.type} from sender:`, sender);
+
   // 1. Strict Schema Validation
   if (!validatePayloadSchema(message)) {
-    console.warn("[Security] Invalid message schema rejected:", message);
+    console.warn("[Background Security] Invalid message schema rejected:", message);
     sendResponse({ success: false, error: "Invalid request format or payload too large." });
     return false;
   }
 
   // 2. Local Rate Limiter Check
   if (!checkLocalRateLimit()) {
-    console.warn("[RateLimit] Local rate limit exceeded.");
+    console.warn("[Background RateLimit] Local rate limit exceeded.");
     sendResponse({ success: false, error: "Too many quick queries. Please wait a moment." });
     return false;
   }
 
+  console.info(`[Background] Schema and Rate Limit passed. Processing query: "${message.payload}"`);
+
   // 3. Process Request Contextually
   handleConnectorRequest(message.payload)
-    .then(data => sendResponse({ success: true, data: data }))
+    .then(data => {
+      console.info(`[Background] Connector request succeeded. Returning payload to sender.`);
+      console.debug(`[Background] Parsed data:`, data);
+      sendResponse({ success: true, data: data });
+    })
     .catch(err => {
       let userMsg = "System Error";
       if (err.message.includes("Failed to fetch")) userMsg = "Local Connector is offline.";
       else if (err.name === 'AbortError') userMsg = "Request timed out.";
       else userMsg = err.message;
 
-      console.error("[Background] Connector Error:", err);
+      console.error("[Background Error] Connector Fetch Exception:", err);
       sendResponse({ success: false, error: userMsg });
     });
 
@@ -125,6 +133,7 @@ async function handleConnectorRequest(query) {
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   const baseUrl = await getConnectorUrl();
+  console.info(`[Background Connector] Target URL: ${baseUrl}${endpoint}`);
 
   try {
     const response = await fetch(`${baseUrl}${endpoint}`, {
@@ -134,6 +143,7 @@ async function handleConnectorRequest(query) {
     });
 
     clearTimeout(timeoutId);
+    console.debug(`[Background Connector] HTTP Status: ${response.status}`);
 
     if (!response.ok) {
       if (response.status === 429) throw new Error("Server limit reached. Please wait.");
@@ -145,6 +155,7 @@ async function handleConnectorRequest(query) {
     return await response.json();
   } catch (error) {
     clearTimeout(timeoutId);
+    console.error(`[Background Connector] Fetch execution failed:`, error);
     throw error;
   }
 }

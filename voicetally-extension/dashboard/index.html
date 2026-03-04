@@ -112,14 +112,7 @@
 <body>
 
     <!-- Ensure user is logged in -->
-    <script>
-        const token = sessionStorage.getItem('vt_token');
-        const role = sessionStorage.getItem('vt_role');
 
-        if (!token) {
-            window.location.href = 'login.html';
-        }
-    </script>
 
     <div class="topbar">
         <div class="brand">
@@ -153,56 +146,7 @@
         </div>
     </div>
 
-    <script>
-        // Bind UI based on Session Storage role
-        if (role === 'admin') {
-            document.getElementById('adminLink').style.display = 'inline-block';
-            document.getElementById('userEmail').textContent = 'Admin User';
-            document.getElementById('greeting').textContent = 'Welcome back, Admin!';
-        } else {
-            document.getElementById('userEmail').textContent = 'Standard User';
-        }
-
-        async function fetchHistory() {
-            try {
-                const res = await fetch('http://127.0.0.1:3000/api/user/history', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-
-                if (!res.ok) {
-                    if (res.status === 401 || res.status === 403) logout(); // Token expired or invalid
-                    document.getElementById('historyList').innerHTML = `<span style="color:var(--error)">${data.error || 'Failed to load history.'}</span>`;
-                    return;
-                }
-
-                if (data.history && data.history.length > 0) {
-                    let html = '<table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px;">';
-                    html += '<tr style="border-bottom: 1px solid var(--border);"><th style="padding:8px">Time</th><th style="padding:8px">Action</th><th style="padding:8px">Status</th></tr>';
-                    data.history.forEach(log => {
-                        html += `<tr>
-                            <td style="padding:8px">${new Date(log.time).toLocaleString()}</td>
-                            <td style="padding:8px">${log.action}</td>
-                            <td style="padding:8px">${log.status}</td>
-                        </tr>`;
-                    });
-                    html += '</table>';
-                    document.getElementById('historyList').innerHTML = html;
-                } else {
-                    document.getElementById('historyList').textContent = 'No recent history found.';
-                }
-            } catch (err) {
-                document.getElementById('historyList').innerHTML = `<span style="color:var(--error)">Backend connection error.</span>`;
-            }
-        }
-
-        fetchHistory();
-
-        function logout() {
-            sessionStorage.clear();
-            window.location.href = 'login.html';
-        }
-    </script>
+    <script src="index.js"></script>
 
 </body>
 

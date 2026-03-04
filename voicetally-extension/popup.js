@@ -8,9 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashboardBtn = document.getElementById('dashboardBtn');
 
   // --- STANDARD EVENT LISTENERS ---
-  submitBtn.addEventListener('click', handleQuery);
+  submitBtn.addEventListener('click', () => {
+    console.info('[Popup] Submit button clicked.');
+    handleQuery();
+  });
   input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleQuery();
+    if (e.key === 'Enter') {
+      console.info('[Popup] Enter key pressed on input.');
+      handleQuery();
+    }
   });
 
   // Focus input on load
@@ -19,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- HEADER ACTIONS ---
   if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
+      console.info('[Popup] Settings button clicked.');
       if (chrome.runtime && chrome.runtime.openOptionsPage) {
         chrome.runtime.openOptionsPage();
       } else {
@@ -29,7 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (dashboardBtn) {
     dashboardBtn.addEventListener('click', () => {
+      console.info('[Popup] Dashboard button clicked.');
       const url = chrome.runtime.getURL('dashboard/login.html');
+      console.debug(`[Popup] Opening Dashboard URL: ${url}`);
       chrome.tabs.create({ url });
     });
   }
@@ -116,8 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     micBtn.addEventListener('click', () => {
       if (isRecording) {
+        console.info('[WebSpeech] Stop command requested.');
         recognition.stop();
       } else {
+        console.info('[WebSpeech] Start command requested.');
         recognition.start();
       }
     });
@@ -139,8 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
     recognition.onerror = (event) => {
       isRecording = false;
       micBtn.classList.remove('listening');
-      console.error('[STT] Web Speech error:', event.error);
+      console.error(`[WebSpeech] Error occurred: ${event.error}`, event);
       if (event.error === 'not-allowed') {
+        console.warn('[WebSpeech] Permission denied by user.');
         updateStatus("Microphone permission denied. Click the mic icon in the address bar.", 'error');
       } else if (event.error === 'no-speech') {
         updateStatus("No speech detected. Try again.", 'error');
@@ -191,8 +203,15 @@ document.addEventListener('DOMContentLoaded', () => {
           isRecording = true;
           micBtn.classList.add('listening');
           updateStatus("Listening...", 'neutral');
-          setTimeout(() => { if (isRecording && mediaRecorder.state !== 'inactive') mediaRecorder.stop(); }, 10000);
+          console.info('[WhisperFallback] MediaRecorder started successfully.');
+          setTimeout(() => {
+            if (isRecording && mediaRecorder.state !== 'inactive') {
+              console.info('[WhisperFallback] Auto-stopping recording after 10s.');
+              mediaRecorder.stop();
+            }
+          }, 10000);
         } catch (err) {
+          console.error(`[WhisperFallback] Setup failed: ${err.name} - ${err.message}`, err);
           if (err.name === 'NotAllowedError') updateStatus("Microphone permission denied.", 'error');
           else updateStatus("Mic error: " + err.message, 'error');
         }
@@ -236,9 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const result = await response.json();
+      console.debug(`[Transcribe API] Response payload:`, result);
+
       if (result.success) {
         const text = (result.text || '').trim();
         if (!text) {
+          console.warn('[Transcribe API] Empty text returned from backend.');
           updateStatus("Couldn't understand audio. Speak clearly and try again.", 'error');
           return;
         }
@@ -246,24 +268,28 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStatus('Heard: "' + text + '"', 'success');
         handleQuery();
       } else {
+        console.error(`[Transcribe API] Server returned logical error: ${result.error}`);
         updateStatus("STT Error: " + (result.error || 'Unknown'), 'error');
       }
     } catch (err) {
+      console.error(`[Transcribe API] Fetch exception:`, err);
       updateStatus("Backend unreachable for STT.", 'error');
-      console.error(err);
     }
   }
 
   // --- CORE TEXT/DATA QUERY PIPELINE ---
   function handleQuery() {
     const query = input.value.trim();
+    console.info(`[Query] Processing input: "${query}"`);
 
     // 1. Client-Side Input Validation
     if (!query) {
+      console.warn('[Query] Input is empty. Aborting.');
       showOutput("Please enter a query.", "error");
       return;
     }
     if (query.length > 200) {
+      console.warn('[Query] Input exceeds maximum length of 200.');
       showOutput("Error: Query too long (max 200 chars).", "error");
       return;
     }
@@ -278,15 +304,20 @@ document.addEventListener('DOMContentLoaded', () => {
       typeof chrome.runtime.sendMessage === 'function' &&
       chrome.runtime.id
     ) {
+      console.info('[Query] Execution Mode: Chrome Extension Service Worker routing...');
       // Send validated schema msg via background
       chrome.runtime.sendMessage({ type: 'QUERY_TALLY', payload: query }, (response) => {
         if (chrome.runtime.lastError) {
+          console.error(`[Query] Chrome Runtime Error: ${chrome.runtime.lastError.message}`);
           updateStatus("Connection Error", "error");
           showOutput("System Error: " + chrome.runtime.lastError.message, "error");
           return;
         }
 
+        console.debug(`[Query] Service Worker Response:`, response);
+
         if (response && response.success) {
+          console.info(`[Query] Successfully processed query via Service Worker.`);
           updateStatus("Result received", "success");
           if (response.data && response.data.detailed_records) {
             showOutput(renderSalesTable(response.data), "success", true);
@@ -294,11 +325,13 @@ document.addEventListener('DOMContentLoaded', () => {
             showOutput(JSON.stringify(response.data, null, 2), "success");
           }
         } else {
+          console.warn(`[Query] Service Worker returned failure.`);
           updateStatus("Request Failed", "error");
           showOutput(response ? response.error : "Unknown error occurred.", "error");
         }
       });
     } else {
+      console.warn('[Query] Execution Mode: Standalone Browser Window (Extension API missing).');
       // Security enforcement: block unauthorized web fetch.
       updateStatus("Not running in extension context.", "error");
       showOutput("Security Error: VoiceTally must be run as a Chrome Extension. Standalone execution is disabled.", "error");
@@ -329,8 +362,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       fetch(`http://127.0.0.1:3000${endpoint}`)
-        .then(r => r.json())
+        .then(r => {
+          console.debug(`[Standalone Fetch] HTTP Status: ${r.status}`);
+          return r.json();
+        })
         .then(data => {
+          console.info('[Standalone Fetch] Data received successfully.', data);
           if (data && data.detailed_records) {
             output.innerHTML = renderSalesTable(data);
             output.style.borderColor = "#28a745";
@@ -342,6 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         })
         .catch(err => {
+          console.error(`[Standalone Fetch] Fatal Error:`, err);
           showOutput("Backend Error: " + err, "error");
         });
     }
