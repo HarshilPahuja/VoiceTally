@@ -17,7 +17,8 @@
     "http://127.0.0.1:3000/*"
   ],
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "commands": {
     "_execute_action": {

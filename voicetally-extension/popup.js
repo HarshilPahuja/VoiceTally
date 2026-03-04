@@ -29,11 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (dashboardBtn) {
     dashboardBtn.addEventListener('click', () => {
-      // Assuming the dashboard is accessible via the local server or deployed URL
-      // Since it's currently stored in the parent 'dashboard' folder, we'll link to it.
-      // In a real extension, you either bundle the dashboard or host it. 
-      // For now, bridging to the local URL or file path might be tricky, let's assume it's hosted or local:
-      window.open('http://127.0.0.1:5500/dashboard/login.html', '_blank'); // Adjust for Live Server or production domain
+      const url = chrome.runtime.getURL('dashboard/login.html');
+      chrome.tabs.create({ url });
     });
   }
 
