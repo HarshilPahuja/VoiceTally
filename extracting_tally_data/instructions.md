@@ -7,6 +7,10 @@ Step 1: Install dependencies
 
 pip install -r requirements.txt
 
+//run the api
+
+uvicorn tally_api:app --reload --port 8000
+
 
 Step 2:
 
@@ -37,3 +41,6 @@ python tally_to_vector.py
 
 
 itll generate the data in chroma_db folder.
+
+
+then you can query the api endpoints.
