@@ -29,7 +29,7 @@ function normalizeRecord(record) {
 
     const amount = parseFloat(record[amountKey]);
     let date;
-    const dateStr = record[dateKey];
+    const dateStr = (record[dateKey] || '').trim();
 
     // Robust Date Parsing
     // 1. Try generic ISO/JS parse first
@@ -53,9 +53,9 @@ function normalizeRecord(record) {
 
     return {
         date: date.toISOString(),
-        customer: record[customerKey] || 'Unknown',
+        customer: (record[customerKey] || 'Unknown').trim(),
         amount: amount,
-        status: (record[statusKey] || 'Paid').toLowerCase() // Default
+        status: (record[statusKey]).trim().toLowerCase() // Default
     };
 }
 
@@ -78,7 +78,10 @@ async function loadData() {
     if (ext === '.csv') {
         return new Promise((resolve, reject) => {
             fs.createReadStream(DATA_FILE_PATH)
-                .pipe(csv())
+                .pipe(csv({
+                    mapHeaders: ({ header }) => header.trim(),
+                    mapValues: ({ value }) => value.trim()
+                }))
                 .on('data', (data) => {
                     const normalized = normalizeRecord(data);
                     if (normalized) results.push(normalized);
@@ -147,10 +150,15 @@ async function getSales(filters = {}) {
         filtered = filtered.filter(r => r.customer.toLowerCase().includes(qCustomer));
     }
 
-    // Status Filter (Exact Match)
+    // Status Filter (Exact Match or Group)
     if (filters.status) {
         const qStatus = filters.status.toLowerCase().trim();
-        filtered = filtered.filter(r => r.status === qStatus);
+        filtered = filtered.filter(r => {
+            if (qStatus === 'pending') {
+                return r.status === 'pending' || r.status === 'unpaid' || r.status === 'processing';
+            }
+            return r.status === qStatus;
+        });
     }
 
     // Compute aggregations
