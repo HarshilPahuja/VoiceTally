@@ -244,6 +244,15 @@
   <header>
     <h2>VoiceTally</h2>
     <div class="header-actions">
+      <!-- TTS Toggle Button -->
+      <button id="ttsToggleBtn" class="icon-btn" title="Toggle Voice Output">
+        <svg id="ttsIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      </button>
       <!-- Settings Button -->
       <button id="settingsBtn" class="icon-btn" title="Settings">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -269,8 +278,12 @@
   <div id="statusBar" class="status-bar">Ready for queries...</div>
 
   <div class="input-group">
-    <input type="text" id="queryInput" placeholder="e.g., 'sales last week', 'pending...'" maxlength="200"
+    <input type="text" id="queryInput" placeholder="e.g., 'sales last week', 'बिक्री पिछले हफ्ते'" maxlength="200"
       autocomplete="off">
+    <select id="langSelect" title="Query Language" style="width: 52px; padding: 8px 4px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 12px; cursor: pointer; background: var(--surface); color: var(--text-main);">
+      <option value="en">EN</option>
+      <option value="hi">HI</option>
+    </select>
     <button id="micBtn" type="button" title="Speak Query">🎤</button>
     <button id="submitBtn" type="button">Ask</button>
   </div>

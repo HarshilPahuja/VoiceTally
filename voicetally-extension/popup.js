@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusBar = document.getElementById('statusBar');
   const settingsBtn = document.getElementById('settingsBtn');
   const dashboardBtn = document.getElementById('dashboardBtn');
+  const ttsToggleBtn = document.getElementById('ttsToggleBtn');
+  const ttsIcon = document.getElementById('ttsIcon');
+  let ttsEnabled = false;
 
   // --- STANDARD EVENT LISTENERS ---
   submitBtn.addEventListener('click', () => {
@@ -41,6 +44,41 @@ document.addEventListener('DOMContentLoaded', () => {
       console.debug(`[Popup] Opening Dashboard URL: ${url}`);
       chrome.tabs.create({ url });
     });
+  }
+
+  // --- TTS TOGGLE ---
+  // Load saved preference
+  if (typeof chrome !== 'undefined' && chrome.storage) {
+    chrome.storage.local.get(['voiceTtsEnabled'], (res) => {
+      ttsEnabled = res.voiceTtsEnabled === true;
+      updateTtsIcon();
+    });
+  }
+
+  if (ttsToggleBtn) {
+    ttsToggleBtn.addEventListener('click', () => {
+      // Cancel any in-progress speech immediately
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      ttsEnabled = !ttsEnabled;
+      updateTtsIcon();
+      console.info(`[TTS] Voice output ${ttsEnabled ? 'enabled' : 'disabled'}`);
+      if (typeof chrome !== 'undefined' && chrome.storage) {
+        chrome.storage.local.set({ voiceTtsEnabled: ttsEnabled });
+      }
+    });
+  }
+
+  function updateTtsIcon() {
+    if (!ttsIcon) return;
+    if (ttsEnabled) {
+      ttsIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+      ttsToggleBtn.style.color = 'var(--primary)';
+      ttsToggleBtn.title = 'Voice Output: ON';
+    } else {
+      ttsIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="1" x2="1" y2="23"></line>';
+      ttsToggleBtn.style.color = 'var(--text-muted)';
+      ttsToggleBtn.title = 'Voice Output: OFF';
+    }
   }
 
   // --- UI HELPERS ---
@@ -102,6 +140,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // --- TEXT-TO-SPEECH ENGINE ---
+  function getLang() {
+    const langSelect = document.getElementById('langSelect');
+    return langSelect ? langSelect.value : 'en';
+  }
+
+  function summarizeForSpeech(data, lang) {
+    if (!data) return lang === 'hi' ? 'कोई डेटा नहीं मिला।' : 'No data found.';
+
+    // Sales response
+    if (data.total !== undefined && data.transaction_count !== undefined) {
+      const total = data.total || 0;
+      const count = data.transaction_count || 0;
+      const avg = data.average_value || 0;
+
+      if (lang === 'hi') {
+        if (count === 0) return 'इस फ़िल्टर के लिए कोई लेनदेन नहीं मिला।';
+        return `कुल बिक्री ${total} रुपये, ${count} लेनदेन। औसत मूल्य ${avg} रुपये।`;
+      } else {
+        if (count === 0) return 'No transactions found for this filter.';
+        return `Total sales: ${total} rupees across ${count} transactions. Average value: ${avg} rupees.`;
+      }
+    }
+
+    // Health response
+    if (data.status) {
+      if (lang === 'hi') return `सिस्टम स्थिति: ${data.status}।`;
+      return `System status: ${data.status}.`;
+    }
+
+    // Generic
+    if (lang === 'hi') return 'परिणाम प्राप्त हुआ।';
+    return 'Result received.';
+  }
+
+  function speakResponse(text, lang) {
+    if (!ttsEnabled || !window.speechSynthesis || !text) return;
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-US';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onstart = () => console.info(`[TTS] Speaking (${utterance.lang}): "${text}"`);
+    utterance.onerror = (e) => console.error('[TTS] Error:', e.error);
+    utterance.onend = () => console.info('[TTS] Finished speaking.');
+
+    window.speechSynthesis.speak(utterance);
+  }
+
   // --- SPEECH RECOGNITION SETUP ---
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -116,10 +208,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setupWebSpeech() {
     const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
+    const langSelect = document.getElementById('langSelect');
+    recognition.lang = langSelect.value === 'hi' ? 'hi-IN' : 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.continuous = false;
+
+    // Update lang before each recognition start
+    langSelect.addEventListener('change', () => {
+      recognition.lang = langSelect.value === 'hi' ? 'hi-IN' : 'en-US';
+      console.info(`[WebSpeech] Language switched to: ${recognition.lang}`);
+    });
 
     let isRecording = false;
 
@@ -324,10 +423,14 @@ document.addEventListener('DOMContentLoaded', () => {
           } else {
             showOutput(JSON.stringify(response.data, null, 2), "success");
           }
+          // TTS: Speak summary of result
+          speakResponse(summarizeForSpeech(response.data, getLang()), getLang());
         } else {
           console.warn(`[Query] Service Worker returned failure.`);
           updateStatus("Request Failed", "error");
-          showOutput(response ? response.error : "Unknown error occurred.", "error");
+          const errMsg = response ? response.error : "Unknown error occurred.";
+          showOutput(errMsg, "error");
+          speakResponse(errMsg, getLang());
         }
       });
     } else {

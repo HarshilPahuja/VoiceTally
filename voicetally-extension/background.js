@@ -97,38 +97,56 @@ async function handleConnectorRequest(query) {
   const normalizedQuery = query.toLowerCase().trim();
   let endpoint = '';
 
-  // --- ROBUST INTENT PARSER ---
-  if (normalizedQuery.includes('sales') || normalizedQuery.includes('sells') || normalizedQuery.includes('revenue')) {
+  // --- ROBUST INTENT PARSER (English + Hindi) ---
+
+  // Sales intent keywords
+  const salesKeywords = ['sales', 'sells', 'revenue', 'बिक्री', 'बिक्रि', 'सेल्स', 'राजस्व', 'कमाई', 'आमदनी'];
+  const isSalesQuery = salesKeywords.some(kw => normalizedQuery.includes(kw));
+
+  // Health/Status intent keywords
+  const healthKeywords = ['health', 'status', 'स्थिति', 'हेल्थ', 'स्टेटस'];
+  const isHealthQuery = healthKeywords.some(kw => normalizedQuery.includes(kw));
+
+  if (isSalesQuery) {
     endpoint = '/sales?';
     const params = new URLSearchParams();
 
-    // Date
-    if (normalizedQuery.includes('last week')) params.append('period', 'week');
-    else if (normalizedQuery.includes('last month')) params.append('period', 'month');
-    else if (normalizedQuery.includes('last year')) params.append('period', 'year');
+    // Date - English + Hindi
+    if (normalizedQuery.includes('last week') || normalizedQuery.includes('पिछले हफ्ते') || normalizedQuery.includes('पिछला हफ्ता') || normalizedQuery.includes('गत सप्ताह')) {
+      params.append('period', 'week');
+    } else if (normalizedQuery.includes('last month') || normalizedQuery.includes('पिछले महीने') || normalizedQuery.includes('पिछला महीना') || normalizedQuery.includes('गत माह')) {
+      params.append('period', 'month');
+    } else if (normalizedQuery.includes('last year') || normalizedQuery.includes('पिछले साल') || normalizedQuery.includes('पिछला साल') || normalizedQuery.includes('गत वर्ष')) {
+      params.append('period', 'year');
+    }
 
-    // Status
-    if (normalizedQuery.includes('unpaid')) params.append('status', 'unpaid');
-    else if (normalizedQuery.includes('processing')) params.append('status', 'processing');
-    else if (normalizedQuery.includes('pending')) params.append('status', 'pending');
-    else if (normalizedQuery.includes('paid')) params.append('status', 'paid');
+    // Status - English + Hindi
+    if (normalizedQuery.includes('unpaid') || normalizedQuery.includes('अवैतनिक') || normalizedQuery.includes('बकाया') || normalizedQuery.includes('अनपेड')) {
+      params.append('status', 'unpaid');
+    } else if (normalizedQuery.includes('processing') || normalizedQuery.includes('प्रोसेसिंग') || normalizedQuery.includes('प्रक्रिया')) {
+      params.append('status', 'processing');
+    } else if (normalizedQuery.includes('pending') || normalizedQuery.includes('लंबित') || normalizedQuery.includes('पेंडिंग')) {
+      params.append('status', 'pending');
+    } else if (normalizedQuery.includes('paid') || normalizedQuery.includes('भुगतान') || normalizedQuery.includes('पेड') || normalizedQuery.includes('चुकाया')) {
+      params.append('status', 'paid');
+    }
 
-    // Customer Target
-    const customerMatch = normalizedQuery.match(/for\s+(?:customer\s+|client\s+)?([a-z0-9\s]+)/i);
+    // Customer Target - English + Hindi
+    const customerMatch = normalizedQuery.match(/(?:for|के लिए|का|की)\s+(?:customer\s+|client\s+|ग्राहक\s+|कस्टमर\s+)?([a-z0-9\s\u0900-\u097F]+)/i);
     if (customerMatch && customerMatch[1]) {
       let custName = customerMatch[1].trim();
-      const stopWords = [' last', ' today', ' yesterday', ' from'];
+      const stopWords = [' last', ' today', ' yesterday', ' from', ' पिछले', ' आज', ' कल', ' से'];
       stopWords.forEach(sw => {
         if (custName.includes(sw)) custName = custName.split(sw)[0];
       });
-      params.append('customer', custName);
+      if (custName.trim()) params.append('customer', custName.trim());
     }
 
     endpoint += params.toString();
-  } else if (normalizedQuery.includes('health') || normalizedQuery.includes('status')) {
+  } else if (isHealthQuery) {
     endpoint = '/health';
   } else {
-    throw new Error("I can only answer about Sales and System Health for now. Try 'sales last month' or 'pending sales'.");
+    throw new Error("I can only answer about Sales and System Health for now. Try 'sales last month' / 'बिक्री पिछले महीने' or 'pending sales' / 'लंबित बिक्री'.");
   }
 
   const controller = new AbortController();

@@ -7,6 +7,7 @@
     <style>
         :root {
             --primary: #4F46E5;
+            --primary-hover: #4338CA;
             --bg: #F9FAFB;
             --surface: #FFFFFF;
             --sidebar: #111827;
@@ -16,6 +17,8 @@
             --text-muted: #6B7280;
             --border: #E5E7EB;
             --danger: #EF4444;
+            --success: #10B981;
+            --radius: 8px;
         }
 
         body {
@@ -29,7 +32,7 @@
             overflow: hidden;
         }
 
-        /* Sidebar Styles */
+        /* Sidebar */
         .sidebar {
             width: 250px;
             background-color: var(--sidebar);
@@ -60,6 +63,7 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
+            cursor: pointer;
             transition: background 0.2s, color 0.2s;
         }
 
@@ -123,10 +127,10 @@
             box-sizing: border-box;
         }
 
-        /* Cards & Panels */
+        /* Panels */
         .panel {
             background: var(--surface);
-            border-radius: 8px;
+            border-radius: var(--radius);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--border);
             margin-bottom: 24px;
@@ -147,7 +151,7 @@
             padding: 24px;
         }
 
-        /* Data Table */
+        /* Table */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -186,7 +190,27 @@
             color: #92400E;
         }
 
-        /* Controls */
+        .badge-paid {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-processing {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-unpaid {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* Buttons */
         .btn {
             padding: 8px 16px;
             border-radius: 6px;
@@ -201,6 +225,16 @@
             background: #F3F4F6;
         }
 
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
         .btn-danger {
             color: var(--danger);
             border-color: #FCA5A5;
@@ -210,85 +244,225 @@
         .btn-danger:hover {
             background: #FEE2E2;
         }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--primary);
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .status-msg {
+            font-size: 13px;
+            margin-top: 12px;
+            min-height: 18px;
+        }
+
+        .status-success {
+            color: var(--success);
+        }
+
+        .status-error {
+            color: var(--danger);
+        }
+
+        .summary-bar {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #F3F4F6;
+            border-radius: var(--radius);
+            font-size: 14px;
+        }
+
+        /* View Section */
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Admin Check is now in admin.js -->
+    <!-- Admin Check is in admin.js -->
 
     <div class="sidebar">
-        <div class="brand">
-            📊 VoiceTally Admin
-        </div>
+        <div class="brand">📊 VoiceTally Admin</div>
         <div class="nav-items">
-            <a href="#" class="nav-item">Dashboard</a>
-            <a href="#" class="nav-item active">Audit Logs</a>
-            <a href="#" class="nav-item">Rate Limit Tuning</a>
-            <a href="#" class="nav-item">Connectors</a>
+            <a class="nav-item active" data-view="viewAuditLogs">📋 Audit Logs</a>
+            <a class="nav-item" data-view="viewRateLimiting">🛡️ Rate Limit Tuning</a>
+            <a class="nav-item" data-view="viewDataExplorer">🔍 Data Explorer</a>
+            <a class="nav-item" data-view="viewConnectors">🔗 Connectors</a>
         </div>
-        <div class="logout-btn" onclick="logout()">
-            ↩ Sign Out
-        </div>
+        <div class="logout-btn" onclick="logout()">↩ Sign Out</div>
     </div>
 
     <div class="main-content">
         <div class="topbar">
-            <div class="page-title">System Audit & Settings</div>
+            <div class="page-title" id="viewTitle">Audit Logs</div>
             <div class="user-profile">Logged in as <strong>Admin</strong></div>
         </div>
 
         <div class="content-area">
-            <!-- Rate Limit Panel -->
-            <div class="panel">
-                <div class="panel-header">
-                    Global Security Controls
+
+            <!-- VIEW: Audit Logs (Default) -->
+            <div id="viewAuditLogs" class="view-section active">
+                <div class="panel">
+                    <div class="panel-header">
+                        Recent Extension Activity
+                        <button class="btn" id="exportCsvBtn">Export CSV</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>User ID</th>
+                                <th>Action / Event</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTableBody">
+                            <!-- Populated by admin.js -->
+                        </tbody>
+                    </table>
                 </div>
-                <!-- Form container -->
-                <div class="panel-body" style="display: flex; gap: 24px;">
-                    <div>
-                        <label
-                            style="display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">API
-                            Rate Limit (Req / min)</label>
-                        <input type="number" id="rateLimitMax" value="100"
-                            style="padding: 8px; border: 1px solid var(--border); border-radius: 4px; width: 120px;">
-                    </div>
-                    <div>
-                        <label
-                            style="display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Window
-                            Size
-                            (Minutes)</label>
-                        <input type="number" id="rateLimitWindow" value="1"
-                            style="padding: 8px; border: 1px solid var(--border); border-radius: 4px; width: 120px;">
-                    </div>
-                    <div style="display: flex; align-items: flex-end;">
-                        <button class="btn" id="applyConfigBtn">Apply Changes</button>
-                    </div>
-                </div>
-                <!-- Status feedback message -->
-                <div id="configStatus" style="padding: 0 24px 16px; font-size: 13px;"></div>
             </div>
 
-            <!-- Audit Logs Table -->
-            <div class="panel">
-                <div class="panel-header">
-                    Recent Extension Activity (Audit Log)
-                    <button class="btn">Export CSV</button>
+            <!-- VIEW: Rate Limit Tuning -->
+            <div id="viewRateLimiting" class="view-section">
+                <div class="panel">
+                    <div class="panel-header">Rate Limit Configuration</div>
+                    <div class="panel-body">
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">
+                            Configure the API rate limiting rules enforced by the backend server. Changes take effect
+                            immediately.
+                        </p>
+                        <div class="row" style="margin-top: 16px;">
+                            <div class="col form-group">
+                                <label>Max Requests per Window</label>
+                                <input type="number" id="rateLimitMax" value="100" style="width: 100%;">
+                            </div>
+                            <div class="col form-group">
+                                <label>Window Size (Minutes)</label>
+                                <input type="number" id="rateLimitWindow" value="1" style="width: 100%;">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="applyConfigBtn">Apply Changes</button>
+                        <div id="configStatus" class="status-msg"></div>
+                    </div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Timestamp</th>
-                            <th>User ID</th>
-                            <th>Action / Event</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="auditTableBody">
-                        <!-- Mock Data Generated by JS -->
-                    </tbody>
-                </table>
+            </div>
+
+            <!-- VIEW: Data Explorer -->
+            <div id="viewDataExplorer" class="view-section">
+                <div class="panel">
+                    <div class="panel-header">Filter Criteria</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col form-group">
+                                <label>Time Period</label>
+                                <select id="filterPeriod" style="width: 100%;">
+                                    <option value="">All Time</option>
+                                    <option value="week">Last 7 Days</option>
+                                    <option value="month">Last 30 Days</option>
+                                    <option value="year">Last Year</option>
+                                </select>
+                            </div>
+                            <div class="col form-group">
+                                <label>Status</label>
+                                <select id="filterStatus" style="width: 100%;">
+                                    <option value="">Any Status</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="unpaid">Unpaid</option>
+                                    <option value="processing">Processing</option>
+                                    <option value="pending">Pending (All Unresolved)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Customer Name (Optional)</label>
+                            <input type="text" id="filterCustomer" placeholder="Search for a specific customer..."
+                                style="width: 100%;">
+                        </div>
+                        <button class="btn btn-primary" id="fetchDataBtn">Fetch Data</button>
+                        <div id="explorerStatus" class="status-msg"></div>
+                    </div>
+                </div>
+
+                <div id="explorerResults" style="display: none;">
+                    <div class="summary-bar" id="summaryBar"></div>
+                    <div class="panel">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Connectors -->
+            <div id="viewConnectors" class="view-section">
+                <div class="panel">
+                    <div class="panel-header">Backend Connection</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label>Local Backend URL</label>
+                            <input type="text" id="connectorUrl" placeholder="http://127.0.0.1:3000"
+                                style="width: 100%;">
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+                                Ensure your VoiceTally backend server is running at this address.
+                            </p>
+                        </div>
+                        <button class="btn btn-primary" id="saveConnectorBtn">Save Connection</button>
+                        <div id="connectorStatus" class="status-msg"></div>
+                    </div>
+                </div>
             </div>
 
         </div>
