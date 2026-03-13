@@ -1,4 +1,5 @@
 const DEFAULT_CONNECTOR_URL = 'http://127.0.0.1:3000';
+const DEFAULT_TALLY_API_URL = 'http://localhost:8000';
 const REQUEST_TIMEOUT_MS = 5000; // 5 seconds max wait time
 
 // Basic In-Memory Rate Limiting (Token Bucket approach for UX)
@@ -40,6 +41,14 @@ async function getConnectorUrl() {
   return new Promise(resolve => {
     chrome.storage.local.get(['connectorUrl'], (result) => {
       resolve(result.connectorUrl || DEFAULT_CONNECTOR_URL);
+    });
+  });
+}
+
+async function getTallyApiUrl() {
+  return new Promise(resolve => {
+    chrome.storage.local.get(['tallyApiUrl'], (result) => {
+      resolve(result.tallyApiUrl || DEFAULT_TALLY_API_URL);
     });
   });
 }
@@ -91,91 +100,174 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 /**
- * Orchestrates the secure fetch to the local service or dashboard API
+ * Detects if text contains Devanagari (Hindi) characters
+ */
+function containsHindi(text) {
+  return /[\u0900-\u097F]/.test(text);
+}
+
+/**
+ * Translates Hindi text to English using MyMemory API (free, no key)
+ * Falls back to original text on failure
+ */
+async function translateToEnglish(text) {
+  try {
+    const encoded = encodeURIComponent(text);
+    const url = `https://api.mymemory.translated.net/get?q=${encoded}&langpair=hi|en`;
+    console.info(`[Translate] Calling MyMemory API for: "${text}"`);
+
+    const response = await fetch(url, { method: 'GET' });
+    if (!response.ok) {
+      console.warn(`[Translate] API returned HTTP ${response.status}. Falling back.`);
+      return text;
+    }
+
+    const data = await response.json();
+    const translated = data?.responseData?.translatedText;
+
+    if (translated && translated.trim().length > 0) {
+      console.info(`[Translate] Result: "${text}" → "${translated}"`);
+      return translated;
+    }
+
+    console.warn(`[Translate] Empty translation. Falling back.`);
+    return text;
+  } catch (err) {
+    console.error(`[Translate] API error:`, err);
+    return text; // Graceful fallback
+  }
+}
+
+/**
+ * Orchestrates ALL data queries — everything goes through Tally/ChromaDB
  */
 async function handleConnectorRequest(query) {
-  const normalizedQuery = query.toLowerCase().trim();
-  let endpoint = '';
+  let processedQuery = query;
 
-  // --- ROBUST INTENT PARSER (English + Hindi) ---
+  // Auto-translate Hindi to English before intent parsing
+  if (containsHindi(query)) {
+    console.info(`[Background] Hindi detected in query. Translating...`);
+    processedQuery = await translateToEnglish(query);
+  }
 
-  // Sales intent keywords
-  const salesKeywords = ['sales', 'sells', 'revenue', 'बिक्री', 'बिक्रि', 'सेल्स', 'राजस्व', 'कमाई', 'आमदनी'];
-  const isSalesQuery = salesKeywords.some(kw => normalizedQuery.includes(kw));
+  const normalizedQuery = processedQuery.toLowerCase().trim();
 
-  // Health/Status intent keywords
+  // Health/Status check → Tally health endpoint
   const healthKeywords = ['health', 'status', 'स्थिति', 'हेल्थ', 'स्टेटस'];
   const isHealthQuery = healthKeywords.some(kw => normalizedQuery.includes(kw));
 
-  if (isSalesQuery) {
-    endpoint = '/sales?';
-    const params = new URLSearchParams();
-
-    // Date - English + Hindi
-    if (normalizedQuery.includes('last week') || normalizedQuery.includes('पिछले हफ्ते') || normalizedQuery.includes('पिछला हफ्ता') || normalizedQuery.includes('गत सप्ताह')) {
-      params.append('period', 'week');
-    } else if (normalizedQuery.includes('last month') || normalizedQuery.includes('पिछले महीने') || normalizedQuery.includes('पिछला महीना') || normalizedQuery.includes('गत माह')) {
-      params.append('period', 'month');
-    } else if (normalizedQuery.includes('last year') || normalizedQuery.includes('पिछले साल') || normalizedQuery.includes('पिछला साल') || normalizedQuery.includes('गत वर्ष')) {
-      params.append('period', 'year');
+  if (isHealthQuery) {
+    const tallyUrl = await getTallyApiUrl();
+    console.info(`[Background] Health check → ${tallyUrl}/`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch(`${tallyUrl}/`, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!response.ok) throw new Error(`Tally API Error (${response.status})`);
+      return await response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
     }
-
-    // Status - English + Hindi
-    if (normalizedQuery.includes('unpaid') || normalizedQuery.includes('अवैतनिक') || normalizedQuery.includes('बकाया') || normalizedQuery.includes('अनपेड')) {
-      params.append('status', 'unpaid');
-    } else if (normalizedQuery.includes('processing') || normalizedQuery.includes('प्रोसेसिंग') || normalizedQuery.includes('प्रक्रिया')) {
-      params.append('status', 'processing');
-    } else if (normalizedQuery.includes('pending') || normalizedQuery.includes('लंबित') || normalizedQuery.includes('पेंडिंग')) {
-      params.append('status', 'pending');
-    } else if (normalizedQuery.includes('paid') || normalizedQuery.includes('भुगतान') || normalizedQuery.includes('पेड') || normalizedQuery.includes('चुकाया')) {
-      params.append('status', 'paid');
-    }
-
-    // Customer Target - English + Hindi
-    const customerMatch = normalizedQuery.match(/(?:for|के लिए|का|की)\s+(?:customer\s+|client\s+|ग्राहक\s+|कस्टमर\s+)?([a-z0-9\s\u0900-\u097F]+)/i);
-    if (customerMatch && customerMatch[1]) {
-      let custName = customerMatch[1].trim();
-      const stopWords = [' last', ' today', ' yesterday', ' from', ' पिछले', ' आज', ' कल', ' से'];
-      stopWords.forEach(sw => {
-        if (custName.includes(sw)) custName = custName.split(sw)[0];
-      });
-      if (custName.trim()) params.append('customer', custName.trim());
-    }
-
-    endpoint += params.toString();
-  } else if (isHealthQuery) {
-    endpoint = '/health';
-  } else {
-    throw new Error("I can only answer about Sales and System Health for now. Try 'sales last month' / 'बिक्री पिछले महीने' or 'pending sales' / 'लंबित बिक्री'.");
   }
+
+  // ALL other queries → Tally vector search
+  console.info(`[Background] Routing query to Tally vector search.`);
+  return await handleTallySearch(processedQuery, normalizedQuery);
+}
+
+
+// ============================================================
+// TALLY VECTOR SEARCH HANDLER
+// ============================================================
+
+async function handleTallySearch(originalQuery, normalizedQuery) {
+  const tallyUrl = await getTallyApiUrl();
+
+  // Build the POST /search request body
+  const searchBody = {
+    query: originalQuery,
+    top_k: 10
+  };
+
+  // Detect specific collection from keywords
+  if (normalizedQuery.includes('ledger')) searchBody.collection = 'ledgers';
+  else if (normalizedQuery.includes('stock')) searchBody.collection = 'stock_items';
+  else if (normalizedQuery.includes('group')) searchBody.collection = 'groups';
+  else if (normalizedQuery.includes('day book') || normalizedQuery.includes('daybook')) searchBody.collection = 'day_book';
+  else if (normalizedQuery.includes('invoice') || normalizedQuery.includes('voucher') || normalizedQuery.includes('journal') || normalizedQuery.includes('receipt') || normalizedQuery.includes('payment')) searchBody.collection = 'sales';
+
+  // Detect voucher type
+  if (normalizedQuery.includes('sales') || normalizedQuery.includes('invoice')) searchBody.voucher_type = 'Sales';
+  else if (normalizedQuery.includes('purchase')) searchBody.voucher_type = 'Purchase';
+  else if (normalizedQuery.includes('receipt')) searchBody.voucher_type = 'Receipt';
+  else if (normalizedQuery.includes('payment')) searchBody.voucher_type = 'Payment';
+  else if (normalizedQuery.includes('journal')) searchBody.voucher_type = 'Journal';
+
+  // Customer extraction
+  const customerMatch = normalizedQuery.match(/(?:for|of|के लिए|का|की)\s+(?:customer\s+|client\s+|party\s+|ग्राहक\s+)?([a-z0-9\s\u0900-\u097F]+)/i);
+  if (customerMatch && customerMatch[1]) {
+    let custName = customerMatch[1].trim();
+    const stopWords = [' last', ' today', ' from', ' above', ' below', ' पिछले', ' से'];
+    stopWords.forEach(sw => {
+      if (custName.includes(sw)) custName = custName.split(sw)[0];
+    });
+    if (custName.trim()) searchBody.customer = custName.trim();
+  }
+
+  // Amount extraction
+  const aboveMatch = normalizedQuery.match(/(?:above|over|greater than|more than|ऊपर|से ज़्यादा)\s+(\d+)/i);
+  if (aboveMatch) searchBody.min_amount = parseFloat(aboveMatch[1]);
+
+  const belowMatch = normalizedQuery.match(/(?:below|under|less than|कम|से कम)\s+(\d+)/i);
+  if (belowMatch) searchBody.max_amount = parseFloat(belowMatch[1]);
+
+  // Date period → from_date
+  const now = new Date();
+  if (normalizedQuery.includes('last week') || normalizedQuery.includes('पिछले हफ्ते')) {
+    const d = new Date(now); d.setDate(d.getDate() - 7);
+    searchBody.from_date = d.toISOString().split('T')[0];
+  } else if (normalizedQuery.includes('last month') || normalizedQuery.includes('पिछले महीने')) {
+    const d = new Date(now); d.setMonth(d.getMonth() - 1);
+    searchBody.from_date = d.toISOString().split('T')[0];
+  } else if (normalizedQuery.includes('last year') || normalizedQuery.includes('पिछले साल')) {
+    const d = new Date(now); d.setFullYear(d.getFullYear() - 1);
+    searchBody.from_date = d.toISOString().split('T')[0];
+  }
+
+  console.info(`[Tally Search] POST ${tallyUrl}/search`, searchBody);
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  const baseUrl = await getConnectorUrl();
-  console.info(`[Background Connector] Target URL: ${baseUrl}${endpoint}`);
-
   try {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: 'GET',
+    const response = await fetch(`${tallyUrl}/search`, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(searchBody),
       signal: controller.signal
     });
 
     clearTimeout(timeoutId);
-    console.debug(`[Background Connector] HTTP Status: ${response.status}`);
 
     if (!response.ok) {
-      if (response.status === 429) throw new Error("Server limit reached. Please wait.");
-      if (response.status === 400) throw new Error("Invalid request parameters.");
-      if (response.status === 401 || response.status === 403) throw new Error("Unauthorized. Please check connector or login.");
-      throw new Error(`Server Error (${response.status})`);
+      if (response.status === 400) {
+        const errData = await response.json();
+        throw new Error(errData.detail || 'Invalid Tally search parameters.');
+      }
+      throw new Error(`Tally API Error (${response.status})`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.info(`[Tally Search] Got ${data.result_count} results.`);
+
+    // Mark response as Tally type for popup renderer
+    data._source = 'tally';
+    return data;
   } catch (error) {
     clearTimeout(timeoutId);
-    console.error(`[Background Connector] Fetch execution failed:`, error);
+    console.error(`[Tally Search] Error:`, error);
     throw error;
   }
 }

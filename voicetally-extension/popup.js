@@ -93,33 +93,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function renderSalesTable(data) {
-    let html = `<div class="result-summary"><b>Total:</b> ₹${data.total || 0} | <b>Transactions:</b> ${data.transaction_count || 0}</div>`;
+  function renderTallyResults(data) {
+    let html = `<div class="result-summary"><b>Query:</b> ${data.query || ''} | <b>Found:</b> ${data.result_count || 0} results</div>`;
 
-    if (data.breakdown) {
-      html += `<div class="result-breakdown">`;
-      for (const [status, count] of Object.entries(data.breakdown)) {
-        html += `<span class="breakdown-pill"><b>${status.charAt(0).toUpperCase() + status.slice(1)}:</b> ${count}</span>`;
-      }
-      html += `</div>`;
-    }
-
-    if (data.detailed_records && data.detailed_records.length) {
+    if (data.results && data.results.length > 0) {
       html += `<table>`;
-      html += `<tr><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th></tr>`;
-      for (const rec of data.detailed_records.slice(0, 10)) {
+      html += `<tr><th>Source</th><th>Summary</th><th>Relevance</th></tr>`;
+      for (const r of data.results.slice(0, 10)) {
+        const pct = Math.round((r.relevance || 0) * 100);
+        const badge = pct >= 70 ? 'color:#065F46;background:#D1FAE5' : pct >= 40 ? 'color:#92400E;background:#FEF3C7' : 'color:#991B1B;background:#FEE2E2';
         html += `<tr>
-          <td>${rec.date ? rec.date.split('T')[0] : ''}</td>
-          <td>${rec.customer}</td>
-          <td>₹${rec.amount}</td>
-          <td>${rec.status}</td>
+          <td><span style="font-size:11px;background:#EEF2FF;color:#4338CA;padding:2px 6px;border-radius:4px;">${r.collection || ''}</span></td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(r.summary || '').replace(/"/g, '&quot;')}">${r.summary || ''}</td>
+          <td><span style="padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:500;${badge}">${pct}%</span></td>
         </tr>`;
       }
       html += `</table>`;
-
-      if (data.detailed_records.length > 10) {
-        html += `<div class="table-footer">Showing first 10 of ${data.detailed_records.length} records.</div>`;
+      if (data.results.length > 10) {
+        html += `<div class="table-footer">Showing first 10 of ${data.results.length} results.</div>`;
       }
+    } else {
+      html += `<div style="font-size:13px;color:var(--text-muted);margin-top:8px;">No matching records found in Tally.</div>`;
     }
     return html;
   }
@@ -149,19 +143,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function summarizeForSpeech(data, lang) {
     if (!data) return lang === 'hi' ? 'कोई डेटा नहीं मिला।' : 'No data found.';
 
-    // Sales response
-    if (data.total !== undefined && data.transaction_count !== undefined) {
-      const total = data.total || 0;
-      const count = data.transaction_count || 0;
-      const avg = data.average_value || 0;
-
-      if (lang === 'hi') {
-        if (count === 0) return 'इस फ़िल्टर के लिए कोई लेनदेन नहीं मिला।';
-        return `कुल बिक्री ${total} रुपये, ${count} लेनदेन। औसत मूल्य ${avg} रुपये।`;
-      } else {
-        if (count === 0) return 'No transactions found for this filter.';
-        return `Total sales: ${total} rupees across ${count} transactions. Average value: ${avg} rupees.`;
+    // Tally vector search response
+    if (data.results) {
+      const count = data.result_count || 0;
+      if (count === 0) {
+        return lang === 'hi' ? 'टैली में कोई मिलता जुलता रिकॉर्ड नहीं मिला।' : 'No matching records found in Tally.';
       }
+      const topResult = data.results[0];
+      const summary = topResult.summary ? topResult.summary.substring(0, 80) : '';
+      if (lang === 'hi') {
+        return `टैली से ${count} परिणाम मिले। शीर्ष परिणाम: ${summary}`;
+      }
+      return `Found ${count} results from Tally. Top result: ${summary}`;
     }
 
     // Health response
@@ -418,8 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response && response.success) {
           console.info(`[Query] Successfully processed query via Service Worker.`);
           updateStatus("Result received", "success");
-          if (response.data && response.data.detailed_records) {
-            showOutput(renderSalesTable(response.data), "success", true);
+          if (response.data && response.data.results) {
+            showOutput(renderTallyResults(response.data), "success", true);
           } else {
             showOutput(JSON.stringify(response.data, null, 2), "success");
           }

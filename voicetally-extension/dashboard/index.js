@@ -66,78 +66,131 @@ function logout() {
 window.logout = logout;
 
 // ============================================================
-// DATA EXPLORER
+// DATA EXPLORER (Tally Vector Search)
 // ============================================================
-const fetchDataBtn = document.getElementById('fetchDataBtn');
+const tallySearchBtn = document.getElementById('tallySearchBtn');
 const explorerStatus = document.getElementById('explorerStatus');
 const explorerResults = document.getElementById('explorerResults');
 const dataTableBody = document.getElementById('dataTableBody');
 const summaryBar = document.getElementById('summaryBar');
 
-fetchDataBtn.addEventListener('click', async () => {
-    explorerStatus.textContent = 'Fetching data...';
+function getTallyUrl() {
+    return new Promise(resolve => {
+        if (typeof chrome !== 'undefined' && chrome.storage) {
+            chrome.storage.local.get(['tallyApiUrl'], (res) => {
+                resolve(res.tallyApiUrl || 'http://localhost:8000');
+            });
+        } else {
+            resolve('http://localhost:8000');
+        }
+    });
+}
+
+tallySearchBtn.addEventListener('click', async () => {
+    const query = document.getElementById('tallySearchQuery').value.trim();
+    if (!query) {
+        explorerStatus.textContent = 'Please enter a search query.';
+        explorerStatus.className = 'status-msg status-error';
+        return;
+    }
+
+    explorerStatus.textContent = 'Searching Tally...';
     explorerStatus.className = 'status-msg';
     explorerResults.style.display = 'none';
     dataTableBody.innerHTML = '';
 
-    const period = document.getElementById('filterPeriod').value;
-    const statusFilter = document.getElementById('filterStatus').value;
-    const customer = document.getElementById('filterCustomer').value.trim();
+    const collection = document.getElementById('tallyCollection').value;
+    const customer = document.getElementById('tallyCustomer').value.trim();
 
-    const params = new URLSearchParams();
-    if (period) params.append('period', period);
-    if (statusFilter) params.append('status', statusFilter);
-    if (customer) params.append('customer', customer);
+    const body = { query, top_k: 20 };
+    if (collection) body.collection = collection;
+    if (customer) body.customer = customer;
 
-    const endpoint = `/sales?${params.toString()}`;
-    console.info(`[Dashboard Explorer] Fetching: http://127.0.0.1:3000${endpoint}`);
+    const tallyUrl = await getTallyUrl();
+    console.info(`[Dashboard Explorer] POST ${tallyUrl}/search`, body);
 
     try {
-        const response = await fetch(`http://127.0.0.1:3000${endpoint}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+        const response = await fetch(`${tallyUrl}/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
         });
 
-        if (!response.ok) throw new Error(`Server returned ${response.status}`);
+        if (!response.ok) throw new Error(`Tally API returned ${response.status}`);
 
         const data = await response.json();
-        console.log(`[Dashboard Explorer] Data received:`, data);
+        console.log(`[Dashboard Explorer] Results:`, data);
 
         explorerStatus.textContent = '';
         explorerResults.style.display = 'block';
 
         summaryBar.innerHTML = `
-            <div><strong>Gross Total:</strong> ₹${data.total || 0}</div>
-            <div><strong>Transactions:</strong> ${data.transaction_count || 0}</div>
-            <div><strong>Average:</strong> ₹${data.average_value || 0}</div>
+            <div><strong>Query:</strong> ${data.query || ''}</div>
+            <div><strong>Results:</strong> ${data.result_count || 0}</div>
         `;
 
-        if (data.detailed_records && data.detailed_records.length > 0) {
-            data.detailed_records.forEach(rec => {
+        if (data.results && data.results.length > 0) {
+            data.results.forEach(r => {
                 const tr = document.createElement('tr');
-                const dateStr = rec.date ? rec.date.split('T')[0] : 'N/A';
-                const st = rec.status.toLowerCase();
-                let statusClass = '';
-                if (st === 'paid') statusClass = 'badge-paid';
-                else if (st === 'unpaid') statusClass = 'badge-unpaid';
-                else if (st === 'processing') statusClass = 'badge-processing';
-                else if (st === 'pending') statusClass = 'badge-pending';
-
+                const pct = Math.round((r.relevance || 0) * 100);
+                const badge = pct >= 70 ? 'badge-paid' : pct >= 40 ? 'badge-processing' : 'badge-unpaid';
                 tr.innerHTML = `
-                    <td>${dateStr}</td>
-                    <td>${rec.customer}</td>
-                    <td>₹${rec.amount}</td>
-                    <td><span class="badge ${statusClass}">${rec.status}</span></td>
+                    <td><span class="badge badge-pending">${r.collection || ''}</span></td>
+                    <td title="${(r.summary || '').replace(/"/g, '&quot;')}">${r.summary || ''}</td>
+                    <td><span class="badge ${badge}">${pct}%</span></td>
                 `;
                 dataTableBody.appendChild(tr);
             });
         } else {
-            dataTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No records match your criteria.</td></tr>`;
+            dataTableBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No matching records found.</td></tr>`;
         }
     } catch (err) {
-        explorerStatus.textContent = `Error: ${err.message}. Is your backend running?`;
+        explorerStatus.textContent = `Error: ${err.message}. Is the Tally API running?`;
         explorerStatus.className = 'status-msg status-error';
         console.error(`[Dashboard Explorer] Error:`, err);
     }
 });
+``
+// ============================================================
+// LIVE UPDATES VIA WEBSOCKET
+// ============================================================
+async function connectWebSocket() {
+    const tallyUrl = await getTallyUrl();
+    // Convert http(s):// to ws(s)://
+    const wsUrl = tallyUrl.replace(/^http/, 'ws') + '/ws';
+    
+    console.info(`[Dashboard] Connecting to WebSocket at ${wsUrl}`);
+    const ws = new WebSocket(wsUrl);
 
+    ws.onopen = () => {
+        console.log(`[Dashboard] WebSocket connected for live Tally updates.`);
+    };
+
+    ws.onmessage = (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (data.type === "data_updated") {
+                console.info(`🔄 [Dashboard] Tally data changed! Automatically refreshing results...`);
+                // Only refresh if there's already a query in the box
+                if (document.getElementById('tallySearchQuery').value.trim()) {
+                    tallySearchBtn.click();
+                }
+            }
+        } catch (err) {
+            console.error('[Dashboard] Error parsing WS message:', err);
+        }
+    };
+
+    ws.onclose = () => {
+        console.warn(`[Dashboard] WebSocket disconnected. Retrying in 5 seconds...`);
+        setTimeout(connectWebSocket, 5000);
+    };
+
+    ws.onerror = (err) => {
+        console.error(`[Dashboard] WebSocket error. Is Tally API running?`);
+        ws.close();
+    };
+}
+
+// Start WebSocket connection
+connectWebSocket();

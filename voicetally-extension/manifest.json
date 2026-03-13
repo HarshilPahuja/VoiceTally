@@ -22,7 +22,9 @@
     "open_in_tab": true
   },
   "host_permissions": [
-    "http://127.0.0.1:3000/*"
+    "http://127.0.0.1:3000/*",
+    "http://localhost:8000/*",
+    "https://api.mymemory.translated.net/*"
   ],
   "permissions": [
     "sidePanel",
