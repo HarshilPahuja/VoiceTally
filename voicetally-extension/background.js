@@ -108,7 +108,9 @@ async function handleConnectorRequest(query) {
     else if (normalizedQuery.includes('last year')) params.append('period', 'year');
 
     // Status
-    if (normalizedQuery.includes('pending') || normalizedQuery.includes('unpaid')) params.append('status', 'pending');
+    if (normalizedQuery.includes('unpaid')) params.append('status', 'unpaid');
+    else if (normalizedQuery.includes('processing')) params.append('status', 'processing');
+    else if (normalizedQuery.includes('pending')) params.append('status', 'pending');
     else if (normalizedQuery.includes('paid')) params.append('status', 'paid');
 
     // Customer Target

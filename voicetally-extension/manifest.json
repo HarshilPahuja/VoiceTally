@@ -3,12 +3,16 @@
   "name": "VoiceTally",
   "version": "0.1.0",
   "description": "Secure business query assistant.",
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "Ask VoiceTally"
-  },
   "background": {
     "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Ask VoiceTally",
+    "default_icon": "images/voice_tally.png"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
@@ -21,6 +25,7 @@
     "http://127.0.0.1:3000/*"
   ],
   "permissions": [
+    "sidePanel",
     "storage",
     "tabs"
   ],

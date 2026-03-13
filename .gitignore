@@ -152,3 +152,6 @@ dist/
 build/
 chroma_db/
 reports/
+
+
+*.xlsx
