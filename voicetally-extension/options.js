@@ -23,16 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- SETTINGS LOGIC ---
     const connectorUrlInput = document.getElementById('connectorUrl');
+    const intelligenceApiUrlInput = document.getElementById('intelligenceApiUrl');
+    const sidePanelToggle = document.getElementById('sidePanelToggle');
     const saveSettingsBtn = document.getElementById('saveSettingsBtn');
     const settingsStatus = document.getElementById('settingsStatus');
 
     // Load existing settings
-    chrome.storage.local.get(['connectorUrl'], (res) => {
-        if (res.connectorUrl) {
-            connectorUrlInput.value = res.connectorUrl;
-        } else {
-            connectorUrlInput.value = 'http://127.0.0.1:3000';
-        }
+    chrome.storage.local.get(['connectorUrl', 'intelligenceApiUrl', 'sidePanelEnabled'], (res) => {
+        connectorUrlInput.value = res.connectorUrl || 'http://127.0.0.1:3000';
+        intelligenceApiUrlInput.value = res.intelligenceApiUrl || 'http://127.0.0.1:8001';
+        sidePanelToggle.checked = res.sidePanelEnabled === true;
     });
 
     saveSettingsBtn.addEventListener('click', () => {
@@ -40,7 +40,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!url.startsWith('http')) url = 'http://' + url;
         if (url.endsWith('/')) url = url.slice(0, -1);
 
-        chrome.storage.local.set({ connectorUrl: url }, () => {
+        let intellUrl = intelligenceApiUrlInput.value.trim();
+        if (!intellUrl.startsWith('http') && intellUrl !== '') intellUrl = 'http://' + intellUrl;
+        if (intellUrl.endsWith('/')) intellUrl = intellUrl.slice(0, -1);
+
+        const isSidePanelEnabled = sidePanelToggle.checked;
+
+        chrome.storage.local.set({ 
+            connectorUrl: url,
+            intelligenceApiUrl: intellUrl || 'http://127.0.0.1:8001',
+            sidePanelEnabled: isSidePanelEnabled
+        }, () => {
+            // Notify background script to apply the behavior immediately
+            try {
+                chrome.runtime.sendMessage({ action: 'update_side_panel', enabled: isSidePanelEnabled });
+            } catch (e) {
+                console.warn("Could not notify background script:", e);
+            }
+
             settingsStatus.textContent = 'Settings saved successfully.';
             settingsStatus.className = 'status-msg status-success';
             setTimeout(() => settingsStatus.textContent = '', 3000);

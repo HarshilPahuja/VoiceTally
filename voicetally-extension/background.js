@@ -53,6 +53,14 @@ async function getTallyApiUrl() {
   });
 }
 
+async function getIntelligenceApiUrl() {
+  return new Promise(resolve => {
+    chrome.storage.local.get(['intelligenceApiUrl'], (result) => {
+      resolve(result.intelligenceApiUrl || 'http://127.0.0.1:8001');
+    });
+  });
+}
+
 chrome.runtime.onInstalled.addListener((details) => {
   console.log("VoiceTally Background Service Online");
   if (details.reason === 'install') {
@@ -60,8 +68,28 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
+// Initialize Side Panel behavior
+chrome.storage.local.get(['sidePanelEnabled'], (res) => {
+  if (chrome.sidePanel && chrome.sidePanel.setPanelBehavior) {
+    chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: !!res.sidePanelEnabled })
+      .catch((err) => console.error("Error setting side panel behavior:", err));
+  }
+});
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.info(`[Background] Received message: ${message.type} from sender:`, sender);
+  console.info(`[Background] Received message from sender:`, sender, message);
+
+  // Handle settings update for side panel
+  if (message.action === 'update_side_panel') {
+    if (chrome.sidePanel && chrome.sidePanel.setPanelBehavior) {
+      chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: !!message.enabled })
+        .catch((err) => console.error("Error updating side panel:", err));
+      sendResponse({ success: true });
+    } else {
+      sendResponse({ success: false, error: "Side Panel API not available" });
+    }
+    return false; // synchronous response
+  }
 
   // 1. Strict Schema Validation
   if (!validatePayloadSchema(message)) {
@@ -184,56 +212,109 @@ async function handleConnectorRequest(query) {
 
 async function handleTallySearch(originalQuery, normalizedQuery) {
   const tallyUrl = await getTallyApiUrl();
+  const intellUrl = await getIntelligenceApiUrl();
 
-  // Build the POST /search request body
-  const searchBody = {
+  let searchBody = {
     query: originalQuery,
     top_k: 10
   };
 
-  // Detect specific collection from keywords
-  if (normalizedQuery.includes('ledger')) searchBody.collection = 'ledgers';
-  else if (normalizedQuery.includes('stock')) searchBody.collection = 'stock_items';
-  else if (normalizedQuery.includes('group')) searchBody.collection = 'groups';
-  else if (normalizedQuery.includes('day book') || normalizedQuery.includes('daybook')) searchBody.collection = 'day_book';
-  else if (normalizedQuery.includes('invoice') || normalizedQuery.includes('voucher') || normalizedQuery.includes('journal') || normalizedQuery.includes('receipt') || normalizedQuery.includes('payment')) searchBody.collection = 'sales';
+  let useFallback = true;
 
-  // Detect voucher type
-  if (normalizedQuery.includes('sales') || normalizedQuery.includes('invoice')) searchBody.voucher_type = 'Sales';
-  else if (normalizedQuery.includes('purchase')) searchBody.voucher_type = 'Purchase';
-  else if (normalizedQuery.includes('receipt')) searchBody.voucher_type = 'Receipt';
-  else if (normalizedQuery.includes('payment')) searchBody.voucher_type = 'Payment';
-  else if (normalizedQuery.includes('journal')) searchBody.voucher_type = 'Journal';
-
-  // Customer extraction
-  const customerMatch = normalizedQuery.match(/(?:for|of|के लिए|का|की)\s+(?:customer\s+|client\s+|party\s+|ग्राहक\s+)?([a-z0-9\s\u0900-\u097F]+)/i);
-  if (customerMatch && customerMatch[1]) {
-    let custName = customerMatch[1].trim();
-    const stopWords = [' last', ' today', ' from', ' above', ' below', ' पिछले', ' से'];
-    stopWords.forEach(sw => {
-      if (custName.includes(sw)) custName = custName.split(sw)[0];
+  // 1. Try Intelligence API (NLP) first
+  try {
+    const nlpController = new AbortController();
+    const nlpTimeout = setTimeout(() => nlpController.abort(), 3000); // Fast timeout for parsing
+    
+    console.info(`[Background] Attempting NLP parse at ${intellUrl}/nlp/parse-query`);
+    const nlpRes = await fetch(`${intellUrl}/nlp/parse-query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: originalQuery }),
+      signal: nlpController.signal
     });
-    if (custName.trim()) searchBody.customer = custName.trim();
+    
+    clearTimeout(nlpTimeout);
+    
+    if (nlpRes.ok) {
+      const nlpData = await nlpRes.json();
+      if (nlpData.intent) {
+        useFallback = false;
+        console.info(`[Background] NLP parse successful. Intent: ${nlpData.intent}`);
+        
+        // Map common intents to Tally collections
+        if (nlpData.intent === 'sales_inquiry' || nlpData.intent === 'invoice') {
+           searchBody.collection = 'sales';
+           searchBody.voucher_type = 'Sales';
+        } else if (nlpData.intent === 'ledger_balance' || nlpData.intent === 'debtor' || nlpData.intent === 'creditor') {
+           searchBody.collection = 'ledgers';
+        } else if (nlpData.intent === 'stock_inquiry') {
+           searchBody.collection = 'stock_items';
+        }
+
+        if (nlpData.entities) {
+          if (nlpData.entities.customer) searchBody.customer = nlpData.entities.customer;
+          if (nlpData.entities.party_name) searchBody.customer = nlpData.entities.party_name;
+          if (nlpData.entities.date_range && nlpData.entities.date_range.start) searchBody.from_date = nlpData.entities.date_range.start;
+          if (nlpData.entities.date_range && nlpData.entities.date_range.end) searchBody.to_date = nlpData.entities.date_range.end;
+        }
+      } else {
+        console.warn(`[Background] NLP returned no intent. Falling back.`);
+      }
+    } else {
+      console.warn(`[Background] NLP returned ${nlpRes.status}. Falling back.`);
+    }
+  } catch (err) {
+    console.warn(`[Background] NLP parse failed, falling back to regex: ${err.message}`);
   }
 
-  // Amount extraction
-  const aboveMatch = normalizedQuery.match(/(?:above|over|greater than|more than|ऊपर|से ज़्यादा)\s+(\d+)/i);
-  if (aboveMatch) searchBody.min_amount = parseFloat(aboveMatch[1]);
+  // 2. Fallback to Regex / Hardcoded Keywords
+  if (useFallback) {
+    console.info(`[Background] Using Regex fallback for query parsing.`);
+    // Detect specific collection from keywords
+    if (normalizedQuery.includes('ledger')) searchBody.collection = 'ledgers';
+    else if (normalizedQuery.includes('stock')) searchBody.collection = 'stock_items';
+    else if (normalizedQuery.includes('group')) searchBody.collection = 'groups';
+    else if (normalizedQuery.includes('day book') || normalizedQuery.includes('daybook')) searchBody.collection = 'day_book';
+    else if (normalizedQuery.includes('invoice') || normalizedQuery.includes('voucher') || normalizedQuery.includes('journal') || normalizedQuery.includes('receipt') || normalizedQuery.includes('payment')) searchBody.collection = 'sales';
 
-  const belowMatch = normalizedQuery.match(/(?:below|under|less than|कम|से कम)\s+(\d+)/i);
-  if (belowMatch) searchBody.max_amount = parseFloat(belowMatch[1]);
+    // Detect voucher type
+    if (normalizedQuery.includes('sales') || normalizedQuery.includes('invoice')) searchBody.voucher_type = 'Sales';
+    else if (normalizedQuery.includes('purchase')) searchBody.voucher_type = 'Purchase';
+    else if (normalizedQuery.includes('receipt')) searchBody.voucher_type = 'Receipt';
+    else if (normalizedQuery.includes('payment')) searchBody.voucher_type = 'Payment';
+    else if (normalizedQuery.includes('journal')) searchBody.voucher_type = 'Journal';
 
-  // Date period → from_date
-  const now = new Date();
-  if (normalizedQuery.includes('last week') || normalizedQuery.includes('पिछले हफ्ते')) {
-    const d = new Date(now); d.setDate(d.getDate() - 7);
-    searchBody.from_date = d.toISOString().split('T')[0];
-  } else if (normalizedQuery.includes('last month') || normalizedQuery.includes('पिछले महीने')) {
-    const d = new Date(now); d.setMonth(d.getMonth() - 1);
-    searchBody.from_date = d.toISOString().split('T')[0];
-  } else if (normalizedQuery.includes('last year') || normalizedQuery.includes('पिछले साल')) {
-    const d = new Date(now); d.setFullYear(d.getFullYear() - 1);
-    searchBody.from_date = d.toISOString().split('T')[0];
+    // Customer extraction
+    const customerMatch = normalizedQuery.match(/(?:for|of|के लिए|का|की)\s+(?:customer\s+|client\s+|party\s+|ग्राहक\s+)?([a-z0-9\s\u0900-\u097F]+)/i);
+    if (customerMatch && customerMatch[1]) {
+      let custName = customerMatch[1].trim();
+      const stopWords = [' last', ' today', ' from', ' above', ' below', ' पिछले', ' से'];
+      stopWords.forEach(sw => {
+        if (custName.includes(sw)) custName = custName.split(sw)[0];
+      });
+      if (custName.trim()) searchBody.customer = custName.trim();
+    }
+
+    // Amount extraction
+    const aboveMatch = normalizedQuery.match(/(?:above|over|greater than|more than|ऊपर|से ज़्यादा)\s+(\d+)/i);
+    if (aboveMatch) searchBody.min_amount = parseFloat(aboveMatch[1]);
+
+    const belowMatch = normalizedQuery.match(/(?:below|under|less than|कम|से कम)\s+(\d+)/i);
+    if (belowMatch) searchBody.max_amount = parseFloat(belowMatch[1]);
+
+    // Date period → from_date
+    const now = new Date();
+    if (normalizedQuery.includes('last week') || normalizedQuery.includes('पिछले हफ्ते')) {
+      const d = new Date(now); d.setDate(d.getDate() - 7);
+      searchBody.from_date = d.toISOString().split('T')[0];
+    } else if (normalizedQuery.includes('last month') || normalizedQuery.includes('पिछले महीने')) {
+      const d = new Date(now); d.setMonth(d.getMonth() - 1);
+      searchBody.from_date = d.toISOString().split('T')[0];
+    } else if (normalizedQuery.includes('last year') || normalizedQuery.includes('पिछले साल')) {
+      const d = new Date(now); d.setFullYear(d.getFullYear() - 1);
+      searchBody.from_date = d.toISOString().split('T')[0];
+    }
   }
 
   console.info(`[Tally Search] POST ${tallyUrl}/search`, searchBody);
@@ -261,6 +342,15 @@ async function handleTallySearch(originalQuery, normalizedQuery) {
 
     const data = await response.json();
     console.info(`[Tally Search] Got ${data.result_count} results.`);
+
+    // Attach inferred NLP data to help Insights Engine
+    if (nlpData) {
+      data._nlp_intent = nlpData.intent || 'UNKNOWN';
+      data._nlp_entities = nlpData.entities || {};
+    } else {
+      data._nlp_intent = 'UNKNOWN';
+      data._nlp_entities = {};
+    }
 
     // Mark response as Tally type for popup renderer
     data._source = 'tally';

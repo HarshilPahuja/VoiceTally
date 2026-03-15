@@ -144,10 +144,13 @@ document.getElementById('applyConfigBtn').addEventListener('click', async () => 
 // DATA EXPLORER (Tally Vector Search)
 // ============================================================
 const tallySearchBtn = document.getElementById('tallySearchBtn');
+const generatePdfBtn = document.getElementById('generatePdfBtn');
 const explorerStatus = document.getElementById('explorerStatus');
 const explorerResults = document.getElementById('explorerResults');
 const dataTableBody = document.getElementById('dataTableBody');
 const summaryBar = document.getElementById('summaryBar');
+
+let lastTallyData = null;
 
 function getTallyUrl() {
     return new Promise(resolve => {
@@ -157,6 +160,18 @@ function getTallyUrl() {
             });
         } else {
             resolve('http://localhost:8000');
+        }
+    });
+}
+
+function getIntelligenceApiUrl() {
+    return new Promise(resolve => {
+        if (typeof chrome !== 'undefined' && chrome.storage) {
+            chrome.storage.local.get(['intelligenceApiUrl'], (res) => {
+                resolve(res.intelligenceApiUrl || 'http://127.0.0.1:8001');
+            });
+        } else {
+            resolve('http://127.0.0.1:8001');
         }
     });
 }
@@ -195,6 +210,7 @@ tallySearchBtn.addEventListener('click', async () => {
 
         const data = await response.json();
         console.log(`[Admin Explorer] Results:`, data);
+        lastTallyData = data;
 
         explorerStatus.textContent = '';
         explorerResults.style.display = 'block';
@@ -223,6 +239,55 @@ tallySearchBtn.addEventListener('click', async () => {
         explorerStatus.textContent = `Error: ${err.message}. Is the Tally API running?`;
         explorerStatus.className = 'status-msg status-error';
         console.error(`[Admin Explorer] Error:`, err);
+    }
+});
+
+generatePdfBtn.addEventListener('click', async () => {
+    if (!lastTallyData || !lastTallyData.results || lastTallyData.results.length === 0) {
+        alert("Please perform a successful search first to generate a report.");
+        return;
+    }
+
+    const intellUrl = await getIntelligenceApiUrl();
+    const points = lastTallyData.results.map(r => r.summary).filter(Boolean).slice(0, 15);
+
+    const body = {
+        title: "VoiceTally Admin Report",
+        summary: `Search Query: "${lastTallyData.query || 'N/A'}"\nTotal Results Found: ${lastTallyData.result_count || 0}`,
+        data: {
+            points: points
+        }
+    };
+
+    generatePdfBtn.textContent = "⏳ Generating...";
+    generatePdfBtn.disabled = true;
+
+    try {
+        console.info(`[Admin] Requesting PDF generation...`);
+        const response = await fetch(`${intellUrl}/reports/generate-pdf`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) throw new Error(`Report generation failed (${response.status})`);
+
+        const data = await response.json();
+        if (data.pdf_path) {
+            let cleanPath = data.pdf_path.replace(/\\/g, '/');
+            if (cleanPath.startsWith('reports/')) {
+                cleanPath = cleanPath.replace('reports/', 'downloads/');
+            }
+            const pdfUrl = `${intellUrl}/${cleanPath}`;
+            console.log(`[Admin] Opening PDF at: ${pdfUrl}`);
+            window.open(pdfUrl, '_blank');
+        }
+    } catch (err) {
+        console.error("[Admin] Error generating PDF:", err);
+        alert("Failed to generate PDF. Make sure the Intelligence API is running at " + intellUrl);
+    } finally {
+        generatePdfBtn.textContent = "📄 Generate PDF Report";
+        generatePdfBtn.disabled = false;
     }
 });
 

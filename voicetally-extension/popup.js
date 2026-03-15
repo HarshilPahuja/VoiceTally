@@ -140,8 +140,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return langSelect ? langSelect.value : 'en';
   }
 
-  function summarizeForSpeech(data, lang) {
+  async function getIntelligenceApiUrl() {
+    return new Promise(resolve => {
+      chrome.storage.local.get(['intelligenceApiUrl'], (result) => {
+        resolve(result.intelligenceApiUrl || 'http://127.0.0.1:8001');
+      });
+    });
+  }
+
+  async function summarizeForSpeech(data, lang) {
     if (!data) return lang === 'hi' ? 'कोई डेटा नहीं मिला।' : 'No data found.';
+
+    // Health response
+    if (data.status) {
+      if (lang === 'hi') return `सिस्टम स्थिति: ${data.status}।`;
+      return `System status: ${data.status}.`;
+    }
 
     // Tally vector search response
     if (data.results) {
@@ -149,18 +163,42 @@ document.addEventListener('DOMContentLoaded', () => {
       if (count === 0) {
         return lang === 'hi' ? 'टैली में कोई मिलता जुलता रिकॉर्ड नहीं मिला।' : 'No matching records found in Tally.';
       }
+
+      // Try hitting the Insight Engine
+      try {
+        const intellUrl = await getIntelligenceApiUrl();
+        const insightBody = {
+          intent: data._nlp_intent || 'UNKNOWN',
+          data: data,
+          entities: data._nlp_entities || {}
+        };
+        console.info(`[TTS] Requesting AI Insight summary from ${intellUrl}...`);
+        const insightRes = await fetch(`${intellUrl}/insights/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(insightBody)
+        });
+
+        if (insightRes.ok) {
+          const insightData = await insightRes.json();
+          if (insightData.text_response) {
+            console.info(`[TTS] Received AI summary:`, insightData.text_response);
+            return insightData.text_response;
+          }
+        } else {
+          console.warn(`[TTS] Insight Engine returned ${insightRes.status}`);
+        }
+      } catch (err) {
+        console.warn(`[TTS] Failed to generate AI speech summary. Falling back.`, err);
+      }
+
+      // Fallback basic summary
       const topResult = data.results[0];
       const summary = topResult.summary ? topResult.summary.substring(0, 80) : '';
       if (lang === 'hi') {
         return `टैली से ${count} परिणाम मिले। शीर्ष परिणाम: ${summary}`;
       }
       return `Found ${count} results from Tally. Top result: ${summary}`;
-    }
-
-    // Health response
-    if (data.status) {
-      if (lang === 'hi') return `सिस्टम स्थिति: ${data.status}।`;
-      return `System status: ${data.status}.`;
     }
 
     // Generic
@@ -417,7 +455,9 @@ document.addEventListener('DOMContentLoaded', () => {
             showOutput(JSON.stringify(response.data, null, 2), "success");
           }
           // TTS: Speak summary of result
-          speakResponse(summarizeForSpeech(response.data, getLang()), getLang());
+          summarizeForSpeech(response.data, getLang()).then(summary => {
+            speakResponse(summary, getLang());
+          });
         } else {
           console.warn(`[Query] Service Worker returned failure.`);
           updateStatus("Request Failed", "error");
