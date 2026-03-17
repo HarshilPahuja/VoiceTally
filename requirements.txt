@@ -6,3 +6,5 @@ python-dotenv
 langdetect
 jinja2
 reportlab
+pandas
+matplotlib

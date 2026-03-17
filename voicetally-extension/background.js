@@ -220,6 +220,7 @@ async function handleTallySearch(originalQuery, normalizedQuery) {
   };
 
   let useFallback = true;
+  let nlpData = null;
 
   // 1. Try Intelligence API (NLP) first
   try {
@@ -237,7 +238,7 @@ async function handleTallySearch(originalQuery, normalizedQuery) {
     clearTimeout(nlpTimeout);
     
     if (nlpRes.ok) {
-      const nlpData = await nlpRes.json();
+      nlpData = await nlpRes.json();
       if (nlpData.intent) {
         useFallback = false;
         console.info(`[Background] NLP parse successful. Intent: ${nlpData.intent}`);

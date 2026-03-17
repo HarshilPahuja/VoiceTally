@@ -21,6 +21,21 @@
             --radius: 8px;
         }
 
+        :root.dark-mode {
+            --primary: #818CF8;
+            --primary-hover: #6366F1;
+            --bg: #111827;
+            --surface: #1F2937;
+            --sidebar: #0f172a;
+            --sidebar-text: #D1D5DB;
+            --sidebar-hover: #334155;
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --border: #374151;
+            --danger: #F87171;
+            --success: #34D399;
+        }
+
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             margin: 0;
@@ -30,6 +45,7 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* Sidebar */
@@ -245,6 +261,22 @@
             background: #FEE2E2;
         }
 
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            color: var(--text-main);
+            margin-right: 12px;
+        }
+
+        .btn-theme:hover {
+            background: var(--border);
+        }
+
         /* Forms */
         .form-group {
             margin-bottom: 16px;
@@ -317,6 +349,52 @@
         .view-section.active {
             display: block;
         }
+
+        /* Analytics Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+        }
+
+        .chart-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .chart-skeleton {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
     </style>
 </head>
 
@@ -325,12 +403,12 @@
     <!-- Admin Check is in admin.js -->
 
     <div class="sidebar">
-        <div class="brand">📊 VoiceTally Admin</div>
+        <div class="brand">VoiceTally Admin</div>
         <div class="nav-items">
-            <a class="nav-item active" data-view="viewAuditLogs">📋 Audit Logs</a>
-            <a class="nav-item" data-view="viewRateLimiting">🛡️ Rate Limit Tuning</a>
-            <a class="nav-item" data-view="viewDataExplorer">🔍 Data Explorer</a>
-            <a class="nav-item" data-view="viewConnectors">🔗 Connectors</a>
+            <a class="nav-item active" data-view="viewAuditLogs">Audit Logs</a>
+            <a class="nav-item" data-view="viewRateLimiting">Rate Limit Tuning</a>
+            <a class="nav-item" data-view="viewDataExplorer">Data Explorer</a>
+            <a class="nav-item" data-view="viewConnectors">Connectors</a>
         </div>
         <div class="logout-btn" onclick="logout()">↩ Sign Out</div>
     </div>
@@ -338,7 +416,10 @@
     <div class="main-content">
         <div class="topbar">
             <div class="page-title" id="viewTitle">Audit Logs</div>
-            <div class="user-profile">Logged in as <strong>Admin</strong></div>
+            <div style="display: flex; align-items: center;">
+                <button id="themeToggleBtn" class="btn-theme" title="Toggle Day/Night Mode">🌙</button>
+                <div class="user-profile">Logged in as <strong>Admin</strong></div>
+            </div>
         </div>
 
         <div class="content-area">
@@ -392,14 +473,46 @@
                 </div>
             </div>
 
-            <!-- VIEW: Data Explorer (Tally Search) -->
             <div id="viewDataExplorer" class="view-section">
+
+                <h3 style="margin-top: 0;">Real-Time Financial Insights</h3>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">These graphs refresh
+                    automatically when new data enters Tally.</p>
+
+                <div class="dashboard-grid" id="chartsContainerAdmin">
+                    <div class="chart-card">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                </div>
+
                 <div class="panel">
                     <div class="panel-header">Search Tally Data</div>
                     <div class="panel-body">
                         <div class="form-group">
                             <label>Search Query</label>
-                            <input type="text" id="tallySearchQuery" placeholder="e.g., 'sundry debtors', 'sales invoice ABC Traders'" style="width: 100%;">
+                            <input type="text" id="tallySearchQuery"
+                                placeholder="e.g., 'sundry debtors', 'sales invoice ABC Traders'" style="width: 100%;">
                         </div>
                         <div class="row">
                             <div class="col form-group">
@@ -415,7 +528,8 @@
                             </div>
                             <div class="col form-group">
                                 <label>Customer (Optional)</label>
-                                <input type="text" id="tallyCustomer" placeholder="Filter by customer..." style="width: 100%;">
+                                <input type="text" id="tallyCustomer" placeholder="Filter by customer..."
+                                    style="width: 100%;">
                             </div>
                         </div>
                         <button class="btn btn-primary" id="tallySearchBtn">Search Tally</button>
@@ -424,9 +538,12 @@
                 </div>
 
                 <div id="explorerResults" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
                         <div class="summary-bar" id="summaryBar" style="flex: 1; margin-bottom: 0;"></div>
-                        <button class="btn btn-primary" id="generatePdfBtn" style="margin-left: 16px; white-space: nowrap; background-color: #10B981; border-color: #10B981;">📄 Generate PDF Report</button>
+                        <button class="btn btn-primary" id="generatePdfBtn"
+                            style="margin-left: 16px; white-space: nowrap; background-color: #10B981; border-color: #10B981;">📄
+                            Generate PDF Report</button>
                     </div>
                     <div class="panel">
                         <table>
@@ -461,7 +578,8 @@
                             <input type="text" id="tallyApiUrl" placeholder="http://localhost:8000"
                                 style="width: 100%;">
                             <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
-                                The FastAPI server for Tally vector search (ChromaDB). Run with: <code>uvicorn tally_api:app --port 8000</code>
+                                The FastAPI server for Tally vector search (ChromaDB). Run with:
+                                <code>uvicorn tally_api:app --port 8000</code>
                             </p>
                         </div>
                         <button class="btn btn-primary" id="saveConnectorBtn">Save Connections</button>

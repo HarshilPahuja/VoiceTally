@@ -176,6 +176,89 @@ function getIntelligenceApiUrl() {
     });
 }
 
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+let currentTheme = localStorage.getItem('vt_theme') || 'light';
+
+function applyTheme(theme) {
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+        if (themeToggleBtn) themeToggleBtn.textContent = '☀️';
+    } else {
+        document.documentElement.classList.remove('dark-mode');
+        if (themeToggleBtn) themeToggleBtn.textContent = '🌙';
+    }
+    currentTheme = theme;
+    localStorage.setItem('vt_theme', theme);
+    // Refresh charts when theme changes
+    if (typeof fetchDashboardVisuals === 'function') {
+        fetchDashboardVisuals();
+    }
+}
+
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+    });
+}
+
+// Initial theme setup (but do not fetch charts immediately here, it's called at the end of the file)
+if (currentTheme === 'dark') {
+    document.documentElement.classList.add('dark-mode');
+    if (themeToggleBtn) themeToggleBtn.textContent = '☀️';
+}
+
+// ============================================================
+// DASHBOARD VISUALS (Pandas + Matplotlib Base64 Graphs)
+// ============================================================
+async function fetchDashboardVisuals() {
+    const chartsContainer = document.getElementById('chartsContainerAdmin');
+    if (!chartsContainer) return;
+
+    const intellUrl = await getIntelligenceApiUrl();
+    const theme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
+    console.info(`[Admin] Fetching graphical insights from ${intellUrl}/dashboard/visuals?theme=${theme}`);
+
+    try {
+        const res = await fetch(`${intellUrl}/dashboard/visuals?theme=${theme}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const data = await res.json();
+        
+        if (data.status === 'success' && data.charts) {
+            const chartMapping = [
+                data.charts.cash_bank,
+                data.charts.profit_loss,
+                data.charts.purchase_sales,
+                data.charts.stock_value,
+                data.charts.capital_assets,
+                data.charts.top_5_reports,
+                data.charts.slow_items,
+                data.charts.overdue_bills
+            ];
+
+            chartsContainer.innerHTML = '';
+            chartMapping.forEach(base64Str => {
+                const card = document.createElement('div');
+                card.className = 'chart-card';
+                if (base64Str) {
+                    const img = document.createElement('img');
+                    img.src = base64Str;
+                    card.appendChild(img);
+                } else {
+                    card.innerHTML = '<span style="color:var(--text-muted)">Data Unavailable</span>';
+                }
+                chartsContainer.appendChild(card);
+            });
+        }
+    } catch (err) {
+        console.error(`[Admin] Failed to fetch visuals:`, err);
+        chartsContainer.innerHTML = `<div style="grid-column: 1 / -1; color: var(--danger); text-align: center;">Failed to load financial insights from Intelligence API. Verify it is running at ${intellUrl}</div>`;
+    }
+}
+
 tallySearchBtn.addEventListener('click', async () => {
     const query = document.getElementById('tallySearchQuery').value.trim();
     if (!query) {
@@ -363,6 +446,8 @@ async function connectWebSocket() {
             const data = JSON.parse(e.data);
             if (data.type === "data_updated") {
                 console.info(`🔄 [Admin Explorer] Tally data changed! Automatically refreshing results...`);
+                // Auto-refresh the charts
+                fetchDashboardVisuals();
                 // Only refresh if the admin actually has a query typed in
                 if (document.getElementById('tallySearchQuery').value.trim()) {
                     tallySearchBtn.click();
@@ -386,3 +471,6 @@ async function connectWebSocket() {
 
 // Start WebSocket connection
 connectWebSocket();
+// Fetch Initial Graph Visualizations
+fetchDashboardVisuals();
+

@@ -14,12 +14,22 @@
             --border: #E5E7EB;
         }
 
+        :root.dark-mode {
+            --primary: #818CF8;
+            --bg: #111827;
+            --surface: #1F2937;
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --border: #374151;
+        }
+
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--bg);
             color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .topbar {
@@ -69,10 +79,27 @@
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
+            color: var(--text-main);
+            transition: background 0.2s;
         }
 
         .btn-logout:hover {
-            background: #F3F4F6;
+            background: var(--border);
+        }
+
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            color: var(--text-main);
+        }
+
+        .btn-theme:hover {
+            background: var(--border);
         }
 
         .content-area {
@@ -243,6 +270,48 @@
             background: #FEE2E2;
             color: #991B1B;
         }
+
+        /* Analytics Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+        }
+
+        .chart-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .chart-skeleton {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
     </style>
 </head>
 
@@ -262,6 +331,7 @@
             <a href="admin.html" id="adminLink">Admin Panel</a>
         </div>
         <div class="user-menu">
+            <button id="themeToggleBtn" class="btn-theme" title="Toggle Day/Night Mode">🌙</button>
             <span id="userEmail">Loading...</span>
             <button class="btn-logout" onclick="logout()">Sign Out</button>
         </div>
@@ -272,6 +342,20 @@
             <h1 id="greeting">Welcome to VoiceTally!</h1>
             <p>Use the Chrome Extension to start querying your data. Your history and generated reports will appear
                 here.</p>
+        </div>
+
+        <h3 style="margin-top: 32px;">Real-Time Financial Insights</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">These graphs refresh automatically when new data enters Tally.</p>
+        
+        <div class="dashboard-grid" id="chartsContainer">
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
         </div>
 
         <div id="historyContainer" style="margin-top: 32px;">
