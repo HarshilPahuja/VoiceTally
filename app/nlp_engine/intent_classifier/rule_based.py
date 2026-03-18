@@ -29,6 +29,18 @@ INTENT_PATTERNS = {
         r"expenses",
         r"bought"
     ],
+    constants.GET_LEDGER_BALANCE: [
+        r"ledger",
+        r"balance of",
+        r"account balance"
+    ],
+    constants.GET_STOCK_SUMMARY: [
+        r"stock inquiry",
+        r"inventory",
+        r"stock level",
+        r"how many.*left",
+        r"do we have.*in stock"
+    ],
 }
 
 
