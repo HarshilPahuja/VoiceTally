@@ -1,18 +1,16 @@
 """
-voicetally_query.py — Standalone NLP Query Tool (GUI)
+voicetally_query.py — System Tray NLP Query Tool
 
-Launched from Tally via the TDL extension menu item.
-Provides:
-  - Text input for typing queries
-  - Voice input (mic recording → STT → auto-query)
-  - Sends queries to /nlp/parse-query
-  - Displays parsed intent + entities in a dark-themed GUI
+Runs as a system tray icon with a global hotkey (Ctrl+Shift+V).
+Press the hotkey or click the tray icon to open the query window.
+Close the window → hides to tray (always ready).
 
 Dependencies:
-    pip install requests sounddevice soundfile
+    pip install requests pystray Pillow keyboard sounddevice soundfile
 
 Usage:
-    python voicetally_query.py
+    pythonw voicetally_query.py        (background, no console)
+    python  voicetally_query.py        (with console for debugging)
 """
 
 import os
@@ -29,18 +27,30 @@ except ImportError:
     print("Missing: pip install requests")
     sys.exit(1)
 
+try:
+    import pystray
+    from PIL import Image, ImageDraw, ImageFont
+except ImportError:
+    pystray = None
+
+try:
+    import keyboard
+except ImportError:
+    keyboard = None
+
+
 # ── Config ────────────────────────────────────────────────────────────
 
 API_BASE = os.environ.get("VT_API_URL", "http://127.0.0.1:8001")
 RECORD_SECONDS = 5
 SAMPLE_RATE = 16000
+HOTKEY = "ctrl+shift+v"
 
 
 # ── Dark Theme Colors ────────────────────────────────────────────────
 
 BG = "#0F1117"
 BG_SECONDARY = "#1A1D27"
-BG_INPUT = "#22263280"
 BG_CARD = "#1E2130"
 BORDER = "#2E3340"
 ACCENT = "#6C63FF"
@@ -53,11 +63,31 @@ INFO = "#60A5FA"
 WARNING = "#FBBF24"
 
 
+# ── Tray Icon Generator ──────────────────────────────────────────────
+
+def create_tray_icon_image():
+    """Generate a small 64x64 icon with 'VT' text for the system tray."""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # Purple rounded background
+    draw.rounded_rectangle([2, 2, 62, 62], radius=14, fill="#6C63FF")
+
+    # "VT" text
+    try:
+        fnt = ImageFont.truetype("arial.ttf", 26)
+    except Exception:
+        fnt = ImageFont.load_default()
+
+    draw.text((10, 14), "VT", fill="white", font=fnt)
+    return img
+
+
 # ── Main Application ─────────────────────────────────────────────────
 
 class VoiceTallyApp:
-    def __init__(self, root):
-        self.root = root
+    def __init__(self):
+        self.root = tk.Tk()
         self.root.title("VoiceTally — NLP Query")
         self.root.configure(bg=BG)
         self.root.resizable(False, False)
@@ -68,7 +98,11 @@ class VoiceTallyApp:
         y = (self.root.winfo_screenheight() // 2) - (h // 2)
         self.root.geometry(f"{w}x{h}+{x}+{y}")
 
+        # Override close button → hide to tray
+        self.root.protocol("WM_DELETE_WINDOW", self.hide_window)
+
         self.is_recording = False
+        self.tray_icon = None
         self._build_ui()
 
     def _build_ui(self):
@@ -82,8 +116,10 @@ class VoiceTallyApp:
             bg=BG, fg=ACCENT
         ).pack(side="left")
 
+        # Hotkey hint
+        hotkey_text = f"  {HOTKEY.upper()}" if keyboard else ""
         self.status_label = tk.Label(
-            header, text="Ready", font=("Segoe UI", 9),
+            header, text=f"Ready{hotkey_text}", font=("Segoe UI", 9),
             bg=BG, fg=TEXT_MUTED
         )
         self.status_label.pack(side="right")
@@ -150,7 +186,6 @@ class VoiceTallyApp:
             bg=BG, fg=TEXT_MUTED
         ).pack(anchor="w", pady=(0, 8))
 
-        # Result card
         self.result_card = tk.Frame(result_frame, bg=BG_CARD, bd=0,
                                      highlightthickness=1, highlightbackground=BORDER)
         self.result_card.pack(fill="both", expand=True)
@@ -158,12 +193,11 @@ class VoiceTallyApp:
         self.result_text = tk.Text(
             self.result_card, font=("Consolas", 11), bg=BG_CARD, fg=TEXT,
             relief="flat", bd=0, wrap="word", padx=14, pady=14,
-            insertbackground=TEXT, state="disabled",
-            highlightthickness=0
+            insertbackground=TEXT, state="disabled", highlightthickness=0
         )
         self.result_text.pack(fill="both", expand=True)
 
-        # Configure text tags for colored output
+        # Text tags for colored output
         self.result_text.tag_configure("label", foreground=TEXT_MUTED, font=("Consolas", 10))
         self.result_text.tag_configure("value", foreground=TEXT, font=("Consolas", 11, "bold"))
         self.result_text.tag_configure("intent", foreground=ACCENT, font=("Consolas", 12, "bold"))
@@ -172,15 +206,77 @@ class VoiceTallyApp:
         self.result_text.tag_configure("info", foreground=INFO, font=("Consolas", 10))
         self.result_text.tag_configure("muted", foreground=TEXT_MUTED, font=("Consolas", 10))
 
-        self._set_result("Type a query or click 🎤 to speak.\n\nExamples:\n  • show sales for last week\n  • ledger balance of ABC Traders\n  • stock inquiry for cement", "muted")
+        hotkey_hint = f"\n\nHotkey: {HOTKEY.upper()}" if keyboard else ""
+        self._set_result(
+            f"Type a query or click 🎤 to speak.\n\n"
+            f"Examples:\n"
+            f"  • show sales for last week\n"
+            f"  • ledger balance of ABC Traders\n"
+            f"  • stock inquiry for cement{hotkey_hint}", "muted"
+        )
 
         # ── Footer ───────────────────────────────────────────────
         footer = tk.Frame(self.root, bg=BG, pady=8, padx=20)
         footer.pack(fill="x")
         tk.Label(
-            footer, text=f"API: {API_BASE}", font=("Segoe UI", 8),
-            bg=BG, fg=TEXT_MUTED
+            footer, text=f"API: {API_BASE}  •  Close to hide to tray",
+            font=("Segoe UI", 8), bg=BG, fg=TEXT_MUTED
         ).pack(side="left")
+
+    # ── Window Show/Hide ─────────────────────────────────────────
+
+    def show_window(self):
+        self.root.deiconify()
+        self.root.lift()
+        self.root.focus_force()
+        self.query_entry.focus_set()
+
+    def hide_window(self):
+        self.root.withdraw()
+
+    def toggle_window(self):
+        if self.root.winfo_viewable():
+            self.hide_window()
+        else:
+            self.show_window()
+
+    # ── System Tray ──────────────────────────────────────────────
+
+    def setup_tray(self):
+        if pystray is None:
+            return
+
+        icon_image = create_tray_icon_image()
+
+        menu = pystray.Menu(
+            pystray.MenuItem("Open VoiceTally", lambda: self.root.after(0, self.show_window), default=True),
+            pystray.Menu.SEPARATOR,
+            pystray.MenuItem("Quit", self._quit_app),
+        )
+
+        self.tray_icon = pystray.Icon(
+            "VoiceTally",
+            icon_image,
+            "VoiceTally — Ctrl+Shift+V",
+            menu
+        )
+
+        # Run tray icon in a separate thread
+        tray_thread = threading.Thread(target=self.tray_icon.run, daemon=True)
+        tray_thread.start()
+
+    def setup_hotkey(self):
+        if keyboard is None:
+            return
+
+        keyboard.add_hotkey(HOTKEY, lambda: self.root.after(0, self.toggle_window))
+
+    def _quit_app(self):
+        if self.tray_icon:
+            self.tray_icon.stop()
+        if keyboard:
+            keyboard.unhook_all()
+        self.root.after(0, self.root.destroy)
 
     # ── Placeholder behavior ─────────────────────────────────────
 
@@ -204,8 +300,6 @@ class VoiceTallyApp:
 
         self._set_status("Parsing with NLP...", INFO)
         self.submit_btn.config(state="disabled", text="...")
-
-        # Run in thread to keep UI responsive
         threading.Thread(target=self._do_parse, args=(query,), daemon=True).start()
 
     def _do_parse(self, query):
@@ -238,7 +332,6 @@ class VoiceTallyApp:
         if self.is_recording:
             return
 
-        # Check if audio libs are available
         try:
             import sounddevice as sd
             import soundfile as sf
@@ -249,7 +342,6 @@ class VoiceTallyApp:
         self.is_recording = True
         self.mic_btn.config(bg=ERROR, fg="white", text="⏺")
         self._set_status(f"Recording {RECORD_SECONDS}s... speak now!", ERROR)
-
         threading.Thread(target=self._do_voice_capture, daemon=True).start()
 
     def _do_voice_capture(self):
@@ -257,20 +349,17 @@ class VoiceTallyApp:
             import sounddevice as sd
             import soundfile as sf
 
-            # 1. Record audio
             audio = sd.rec(
                 int(RECORD_SECONDS * SAMPLE_RATE),
                 samplerate=SAMPLE_RATE, channels=1, dtype="float32"
             )
             sd.wait()
 
-            # Save temp file
             tmp = os.path.join(tempfile.gettempdir(), "vt_rec.wav")
             sf.write(tmp, audio, SAMPLE_RATE)
 
             self.root.after(0, lambda: self._set_status("Transcribing...", INFO))
 
-            # 2. Send to STT
             with open(tmp, "rb") as f:
                 stt_resp = requests.post(
                     f"{API_BASE}/stt/transcribe",
@@ -289,12 +378,9 @@ class VoiceTallyApp:
                 self.root.after(0, self._show_error, "Couldn't understand audio. Try again.")
                 return
 
-            # Show transcribed text in input
             self.root.after(0, lambda: self.query_var.set(text))
             self.root.after(0, lambda: self.query_entry.config(fg=TEXT))
             self.root.after(0, lambda: self._set_status(f'Heard: "{text}" — parsing...', SUCCESS))
-
-            # 3. Auto-send to parse-query
             self._do_parse(text)
 
         except Exception as e:
@@ -363,10 +449,26 @@ class VoiceTallyApp:
     def _set_status(self, text, color=TEXT_MUTED):
         self.status_label.config(text=text, fg=color)
 
+    # ── Run ──────────────────────────────────────────────────────
+
+    def run(self):
+        # Setup tray icon
+        self.setup_tray()
+
+        # Setup global hotkey
+        self.setup_hotkey()
+
+        # Start hidden in tray (background mode)
+        if "--show" in sys.argv:
+            self.show_window()
+        else:
+            self.hide_window()
+
+        self.root.mainloop()
+
 
 # ── Entry Point ──────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = VoiceTallyApp(root)
-    root.mainloop()
+    app = VoiceTallyApp()
+    app.run()
