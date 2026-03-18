@@ -1,276 +1,71 @@
 ;; =====================================================================
-;; VoiceTally TDL Extension — NLP Task Manager
-;; Adds a query form to Tally that sends text to /nlp/parse-query
-;; and displays the parsed intent + entities.
+;; VoiceTally TDL Extension — NLP Query Launcher
 ;;
-;; Load: Gateway of Tally → F1 (Help) → TDL & Add-on → Load TDL
-;;       Browse to this file and press Enter.
+;; Adds a menu item to Gateway of Tally that launches the
+;; Python NLP query tool automatically.
+;;
+;; Load: Gateway of Tally > F1 (Help) > TDL & Add-on > F4 > Add file
 ;; =====================================================================
 
 
-;; ─── MENU INTEGRATION ───────────────────────────────────────────────
+;; ─── Add "VoiceTally Query" to the Gateway of Tally menu ───────────
 
 [#Menu: Gateway of Tally]
-    Add : Key Item   : VoiceTally NLP Query : V : Display : VTQueryForm
+    Add : Key Item : VoiceTally NLP Query : V : Display : VTLaunchReport
 
 
-;; ─── SYSTEM VARIABLES (for user input storage) ──────────────────────
+;; ─── Report that auto-launches the Python GUI on open ───────────────
 
-[System: Variable]
-    Variable : vtQueryText   : String : ""
-    Variable : vtResultText  : String : "Results will appear here..."
+[Report: VTLaunchReport]
+    Form : VTLaunchForm
 
+[Form: VTLaunchForm]
+    Parts  : VTLaunchPart
+    Height : 25% Screen
+    Width  : 45% Screen
+    On     : Form Open : Yes : CALL : VTTryLaunch
 
-;; ─── MAIN QUERY FORM ────────────────────────────────────────────────
+[Part: VTLaunchPart]
+    Lines : VTLine1, VTBlank1, VTLine2, VTLine3
 
-[Form: VTQueryForm]
-    Add : Parts : VTFormParts At Beginning
-    Height : 50% Screen
-    Width  : 60% Screen
-    Local  : String : vtStatusMsg : "Ready — type a query and press Send"
+[Line: VTLine1]
+    Fields : VTF1
 
-[Parts: VTFormParts]
-    Add : Lines : VTHeaderLine, VTSeparator1
-    Add : Lines : VTInputLine
-    Add : Lines : VTSeparator2, VTButtonLine
-    Add : Lines : VTSeparator3, VTStatusLine
-    Add : Lines : VTSeparator4, VTResultHeaderLine
-    Add : Lines : VTResultLine
-
-;; ─── HEADER ─────────────────────────────────────────────────────────
-
-[Line: VTHeaderLine]
-    Add : Fields : VTHeaderField
-    Height     : 1
-    Indent     : 2
-
-[Field: VTHeaderField]
-    Set as    : "═══ VoiceTally — NLP Query ═══"
-    Align     : Centre
-    Style     : Bold
-    Width     : 100% Page
-
-;; ─── SEPARATORS ─────────────────────────────────────────────────────
-
-[Line: VTSeparator1]
-    Add : Fields : VTSepField1
-
-[Field: VTSepField1]
-    Set as : ""
-    Width  : 100% Page
-
-[Line: VTSeparator2]
-    Add : Fields : VTSepField2
-
-[Field: VTSepField2]
-    Set as : ""
-    Width  : 100% Page
-
-[Line: VTSeparator3]
-    Add : Fields : VTSepField3
-
-[Field: VTSepField3]
-    Set as : ""
-    Width  : 100% Page
-
-[Line: VTSeparator4]
-    Add : Fields : VTSepField4
-
-[Field: VTSepField4]
-    Set as : ""
-    Width  : 100% Page
-
-;; ─── TEXT INPUT ─────────────────────────────────────────────────────
-
-[Line: VTInputLine]
-    Add : Fields : VTInputLabel, VTInputField
-    Height : 1
-    Indent : 2
-
-[Field: VTInputLabel]
-    Set as : "Query: "
+[Field: VTF1]
+    Set as : "VoiceTally NLP Query Tool"
     Style  : Bold
-    Width  : 15% Page
-
-[Field: VTInputField]
-    Use : Name Field
-    Set as : ##vtQueryText
-    Modifiable : Yes
-    Width      : 80% Page
-    Info       : "Type your query, e.g. 'show sales for last week'"
-
-;; ─── ACTION BUTTONS ─────────────────────────────────────────────────
-
-[Line: VTButtonLine]
-    Add : Fields : VTSendButton, VTVoiceButton, VTClearButton
-    Height : 1
-    Indent : 2
-
-[Field: VTSendButton]
-    Use     : Name Field
-    Set as  : " ▶ Send to NLP "
-    Style   : Bold
-    Width   : 25% Page
-    Inactive: $$IsEmpty:##vtQueryText
-    Key     : VTSendAction
-
-[Key: VTSendAction]
-    Key    : Enter
-    Action : Call : VTDoHTTPPost
-
-[Field: VTVoiceButton]
-    Use    : Name Field
-    Set as : " 🎤 Voice Input "
-    Style  : Normal
-    Width  : 25% Page
-    Key    : VTVoiceAction
-
-[Key: VTVoiceAction]
-    Key    : Alt+V
-    Action : Call : VTDoVoiceCapture
-
-[Field: VTClearButton]
-    Use    : Name Field
-    Set as : " ✕ Clear "
-    Style  : Normal
-    Width  : 20% Page
-    Key    : VTClearAction
-
-[Key: VTClearAction]
-    Key    : Alt+C
-    Action : Set : vtQueryText  : ""
-    Action : Set : vtResultText : "Results will appear here..."
-
-;; ─── STATUS LINE ────────────────────────────────────────────────────
-
-[Line: VTStatusLine]
-    Add : Fields : VTStatusField
-    Height : 1
-    Indent : 2
-
-[Field: VTStatusField]
-    Set as : ##vtStatusMsg
-    Width  : 100% Page
-    Style  : Normal
-
-;; ─── RESULT DISPLAY ─────────────────────────────────────────────────
-
-[Line: VTResultHeaderLine]
-    Add : Fields : VTResultHeaderField
-    Height : 1
-    Indent : 2
-
-[Field: VTResultHeaderField]
-    Set as : "─── Parsed Result ───"
     Align  : Centre
-    Style  : Bold
     Width  : 100% Page
 
-[Line: VTResultLine]
-    Add : Fields : VTResultField
-    Height : 8
-    Indent : 2
+[Line: VTBlank1]
+    Fields : VTBlankF1
 
-[Field: VTResultField]
-    Set as : ##vtResultText
+[Field: VTBlankF1]
+    Set as : ""
     Width  : 100% Page
-    Lines  : 8
+
+[Line: VTLine2]
+    Fields : VTF2
+
+[Field: VTF2]
+    Set as : "Launching query tool..."
+    Align  : Centre
+    Width  : 100% Page
+
+[Line: VTLine3]
+    Fields : VTF3
+
+[Field: VTF3]
+    Set as : "Press Esc to close"
+    Align  : Centre
+    Width  : 100% Page
 
 
-;; =====================================================================
-;; HTTP POST ACTION — Sends query to Intelligence API /nlp/parse-query
-;; =====================================================================
+;; ─── Function to launch the batch file ──────────────────────────────
 
-[Function: VTDoHTTPPost]
-    ;; Set status
-    00 : Set : vtStatusMsg : "Sending query to NLP engine..."
-
-    ;; Fire HTTP POST to the Intelligence API
-    10 : HTTP Post
-        : URL           : "http://127.0.0.1:8001/nlp/parse-query"
-        : Encoding      : UTF8
-        : Request Report: VTRequestReport
-        : Post Action Fn: VTHandleResponse
-
-[Report: VTRequestReport]
-    Form : VTRequestForm
-
-[Form: VTRequestForm]
-    Parts : VTRequestPart
-
-[Part: VTRequestPart]
-    Lines : VTRequestLine
-
-[Line: VTRequestLine]
-    Fields : VTRequestQueryField
-
-[Field: VTRequestQueryField]
-    JSON Tag : "query"
-    Set as   : ##vtQueryText
-    XMLTag   : "query"
-
-;; ─── RESPONSE HANDLER ───────────────────────────────────────────────
-
-[Function: VTHandleResponse]
-    ;; The HTTP response is available in the Parameter Collection
-    ;; Parse the JSON response fields
-
-    Variable : vtIntent     : String
-    Variable : vtEntities   : String
-    Variable : vtLanguage   : String
-    Variable : vtOrigQuery  : String
-    Variable : vtError      : String
-
-    00 : Set : vtIntent    : $$HTTPRespJsonValue:"intent"
-    01 : Set : vtEntities  : $$HTTPRespJsonValue:"entities"
-    02 : Set : vtLanguage  : $$HTTPRespJsonValue:"language"
-    03 : Set : vtOrigQuery : $$HTTPRespJsonValue:"original_query"
-    04 : Set : vtError     : $$HTTPRespJsonValue:"error"
-
-    ;; Build result display string
-    10 : If : NOT $$IsEmpty:##vtError
-    11 :     Set : vtResultText : "⚠ Error: " + ##vtError
-    12 :     Set : vtStatusMsg  : "Parse failed — see result"
-    13 : Else
-    14 :     Set : vtResultText : +
-            "Intent:    " + ##vtIntent   + $$NewLine + +
-            "Entities:  " + ##vtEntities + $$NewLine + +
-            "Language:  " + ##vtLanguage + $$NewLine + +
-            "Query:     " + ##vtOrigQuery
-    15 :     Set : vtStatusMsg : "✓ Parsed: " + ##vtIntent
-    16 : End If
-
+[Function: VTTryLaunch]
+    01 : Exec Command : "cmd /c start "" "d:\Projects\chopped\VoiceTally\tdl-extension\launch_voicetally.bat""
 
 ;; =====================================================================
-;; VOICE INPUT — Launches companion Python script for STT
-;; =====================================================================
-
-[Function: VTDoVoiceCapture]
-    ;; Launch the Python voice capture companion script.
-    ;; The script records audio, sends to /stt/transcribe, gets text,
-    ;; then sends the text to /nlp/parse-query and writes result to a temp file
-    ;; that we read back.
-
-    00 : Set : vtStatusMsg  : "🎤 Recording... speak now (5 seconds)"
-    01 : Set : vtResultText : "Listening via microphone..."
-
-    ;; Execute the voice capture Python script
-    ;; The script writes transcribed text to a temp file
-    10 : Exec Command
-        : "python " + $$SysInfo:WorkingPath + "\voicetally_voice.py"
-
-    ;; Read back the transcribed text from the temp file
-    20 : Set : vtQueryText : $$FileRead:$$SysInfo:TempPath + "\vt_voice_result.txt"
-
-    ;; If we got text, auto-send to NLP
-    30 : If : NOT $$IsEmpty:##vtQueryText
-    31 :     Set : vtStatusMsg : "Voice captured: " + ##vtQueryText
-    32 :     Call : VTDoHTTPPost
-    33 : Else
-    34 :     Set : vtStatusMsg : "⚠ No voice captured. Try again."
-    35 :     Set : vtResultText : "Voice capture returned empty. Check microphone."
-    36 : End If
-
-;; =====================================================================
-;; END OF TDL EXTENSION
+;; END
 ;; =====================================================================
