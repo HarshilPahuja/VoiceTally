@@ -211,7 +211,7 @@ class VoiceTallyApp:
             f"Type a query or click 🎤 to speak.\n\n"
             f"Examples:\n"
             f"  • show sales for last week\n"
-            f"  • ledger balance of ABC Traders\n"
+            f"  • ledger transactions for ABC Traders\n"
             f"  • stock inquiry for cement{hotkey_hint}", "muted"
         )
 
@@ -305,7 +305,7 @@ class VoiceTallyApp:
     def _do_parse(self, query):
         try:
             resp = requests.post(
-                f"{API_BASE}/nlp/parse-query",
+                f"{API_BASE}/nlp/ask",
                 json={"query": query},
                 timeout=10
             )
@@ -395,46 +395,25 @@ class VoiceTallyApp:
         self.result_text.config(state="normal")
         self.result_text.delete("1.0", "end")
 
-        intent = data.get("intent") or "UNKNOWN"
-        entities = data.get("entities", {})
-        language = data.get("language", "—")
-        original = data.get("original_query", "—")
         error = data.get("error")
+        answer = data.get("answer")
+        intent = data.get("intent") or "UNKNOWN"
 
         if error:
             self.result_text.insert("end", f"⚠ {error}\n", "error")
-            self._set_status("Parse returned an error", WARNING)
+            self._set_status("Query returned an error", WARNING)
+            self.result_text.config(state="disabled")
+            return
+
+        self._set_status(f"✓ {intent}", SUCCESS)
+
+        self.result_text.insert("end", "ANSWER\n", "label")
+        if answer:
+            self.result_text.insert("end", f"\n{answer}\n\n", "value")
         else:
-            self._set_status(f"✓ {intent}", SUCCESS)
-
-        self.result_text.insert("end", "INTENT\n", "label")
-        self.result_text.insert("end", f"  {intent}\n\n", "intent")
-
-        if entities:
-            self.result_text.insert("end", "ENTITIES\n", "label")
-            self._insert_entities(entities, indent=2)
-            self.result_text.insert("end", "\n")
-
-        self.result_text.insert("end", "LANGUAGE\n", "label")
-        self.result_text.insert("end", f"  {language}\n\n", "value")
-
-        self.result_text.insert("end", "ORIGINAL QUERY\n", "label")
-        self.result_text.insert("end", f"  {original}\n", "info")
+            self.result_text.insert("end", "\nNo answer was generated.\n\n", "muted")
 
         self.result_text.config(state="disabled")
-
-    def _insert_entities(self, obj, indent=0):
-        prefix = " " * indent
-        if isinstance(obj, dict):
-            for k, v in obj.items():
-                if isinstance(v, dict):
-                    self.result_text.insert("end", f"{prefix}{k}:\n", "label")
-                    self._insert_entities(v, indent + 2)
-                else:
-                    self.result_text.insert("end", f"{prefix}{k}: ", "label")
-                    self.result_text.insert("end", f"{v}\n", "entity")
-        else:
-            self.result_text.insert("end", f"{prefix}{obj}\n", "entity")
 
     def _show_error(self, msg):
         self._set_result(f"❌ {msg}", "error")

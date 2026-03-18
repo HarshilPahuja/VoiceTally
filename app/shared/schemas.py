@@ -14,6 +14,7 @@ class NLPResponse(BaseModel):
     original_query: str
     language: Optional[str] = None
     error: Optional[str] = None
+    answer: Optional[str] = None
 
 
 # ---------- Insights ----------

@@ -1,30 +1,41 @@
 # VoiceTally — NLP Tally Extension
 
-This folder contains the Tally integration for VoiceTally. It provides a natural language interface (text and voice) to query Tally data without navigating through menus.
+This folder contains the VoiceTally integration for TallyPrime. It provides a natural language interface (text and voice) to query real Tally data without navigating through menus, returning human-readable answers instantly.
 
 ## Architecture
 
-Due to limitations in Tally's HTTP and external execution capabilities (especially in TallyPrime EDU), the extension operates in two parts:
+Due to limitations in Tally's HTTP and external execution capabilities, the extension operates in two frontend parts, backed by a powerful cross-API orchestration layer:
 
-1. **The Backend (System Tray App)**: `voicetally_query.py` acts as the workhorse. It runs in the background as a system tray app, capturing global hotkeys, recording microphone input, and communicating directly with the Intelligence API.
+1. **The Backend (System Tray App)**: `voicetally_query.py` acts as the workhorse. It runs in the background as a system tray app, captures global hotkeys (`Ctrl+Shift+V`), records microphone input, and communicates directly with the Intelligence API.
 2. **The Frontend (TDL Menu)**: `voicetally_nlp.tdl` adds a menu item to the Gateway of Tally. This primarily serves as a reminder/instruction panel on how to use the tool.
+
+### Flow & Master Endpoint Orchestration
+The magic happens in the `/ask` Master Endpoint:
+1. The Tray App sends your query to the **Intelligence API** (`:8001/nlp/ask`).
+2. The NLP Engine parses the natural language into an **Intent** and **Entities** (e.g. `GET_SALES_SUMMARY`, `date_range`).
+3. The Master Endpoint dynamically constructs a search query to the local **Tally Data API** (`:8000/search`), which is synced every 60s with Tally via ChromaDB.
+4. The Master Endpoint aggregates the raw Tally data (e.g., adding up the `amount` fields on all Day Book vouchers) and returns a **human-readable sentence** to the Tray App.
 
 ```mermaid
 graph LR
-    A["Tally<br>(TDL Menu)"] -.->|Instructions| A
-    U["User"] -->|"Ctrl+Shift+V"| B["System Tray App<br>(voicetally_query.py)"]
-    B -->|HTTP POST JSON| C["/nlp/parse-query<br>(Port 8001)"]
+    U["User anywhere"] -->|"Ctrl+Shift+V"| B["System Tray App<br>(voicetally_query.py)"]
+    B -->|Text Query| C["Master Endpoint<br>/ask (Port 8001)"]
     B -->|Mic Audio POST| D["/stt/transcribe<br>(Port 8001)"]
-    D -.->|"Transcribed Text"| B
-    C -.->|"Intent + Entities JSON"| B
+    D -.->|Transcribed Text| B
+    
+    C -->|Parse Request| E["Internal NLP Parser"]
+    C -->|ChromaDB Search + Filters| F["Tally Database API<br>/search (Port 8000)"]
+    
+    F -->|Raw Synced Tally Records| C
+    C -->|Human-readable Answer| B
 ```
 
 ## Files
 
 | File | Description |
 |---|---|
-| `voicetally_query.py` | The core Python GUI application. Handles the dark-themed UI, voice recording (`sounddevice`), HTTP requests, and runs as a system tray icon (`pystray`). |
-| `launch_voicetally.bat` | A Windows batch script that launches the Python GUI in the background (`pythonw.exe`). This is the intended entry point for users. |
+| `voicetally_query.py` | The core Python GUI application. Handles the dark-themed UI, voice recording (`sounddevice`), HTTP requests, and runs as a system tray icon (`pystray`). Displays the final human-readable answers. |
+| `launch_voicetally.bat` | A Windows batch script that launches the Python GUI in the background (`pythonw.exe`). This is the intended entry point for end users. |
 | `voicetally_nlp.tdl` | The TDL (Tally Definition Language) file. Loads a menu item into the Gateway of Tally displaying instructions. |
 
 ## Setup Instructions
@@ -32,7 +43,7 @@ graph LR
 ### 1. Prerequisites
 Ensure you have Python 3.x installed, along with the required dependencies. Run the following from the project root:
 ```bash
-# Install core API dependencies
+# Install core API dependencies (includes httpx, uvicorn, fastapi)
 pip install -r requirements.txt
 
 # Install tray app specific dependencies
@@ -40,9 +51,18 @@ pip install pystray Pillow keyboard sounddevice soundfile requests
 ```
 > **Note for Voice Input:** `openai-whisper` (used by the backend API) requires `ffmpeg` to be installed on your system.
 
-### 2. Start the Backend Server
-The extension requires the Intelligence API to be running on port 8001. From the project root:
+### 2. Start the Backend Servers
+The extension requires **both** the Tally sync/search API and the Intelligence API to be running.
+
+**Terminal 1 (Tally DB Sync & Search):**
 ```bash
+cd extracting_tally_data
+uvicorn tally_api:app --port 8000
+```
+
+**Terminal 2 (Intelligence NLP Engine):**
+```bash
+# From project root
 uvicorn app.main:app --port 8001
 ```
 
