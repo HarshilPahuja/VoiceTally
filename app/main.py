@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.logger import setup_logger
-from app.api import nlp_routes, insight_routes, report_routes, dashboard_routes
+from app.api import nlp_routes, insight_routes, report_routes, dashboard_routes, stt_routes
 
 setup_logger()
 
@@ -34,6 +34,7 @@ app.include_router(nlp_routes.router)
 app.include_router(insight_routes.router)
 app.include_router(report_routes.router)
 app.include_router(dashboard_routes.router)
+app.include_router(stt_routes.router)
 
 
 @app.get("/")

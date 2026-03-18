@@ -8,3 +8,5 @@ jinja2
 reportlab
 pandas
 matplotlib
+openai-whisper
+python-multipart
