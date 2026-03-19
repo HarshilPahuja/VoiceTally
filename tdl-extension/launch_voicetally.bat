@@ -62,9 +62,12 @@ echo [MAINTENANCE] Closing any stale background servers...
 FOR /F "tokens=5" %%T IN ('netstat -ano ^| findstr :8000') DO taskkill /PID %%T /F >nul 2>&1
 FOR /F "tokens=5" %%T IN ('netstat -ano ^| findstr :8001') DO taskkill /PID %%T /F >nul 2>&1
 
-echo [LAUNCHING] Starting Backend API Servers...
-start "VoiceTally Data API" /MIN cmd /c "cd /d "%PROJECT_ROOT%\extracting_tally_data" && "%PYTHON_EXE%" -m uvicorn tally_api:app --port 8000"
-start "VoiceTally Intelligence API" /MIN cmd /c "cd /d "%PROJECT_ROOT%" && "%PYTHON_EXE%" -m uvicorn app.main:app --port 8001"
+echo [LAUNCHING] Starting Backend API Servers silently...
+cd /d "%PROJECT_ROOT%\extracting_tally_data"
+start "" "%PYTHONW_EXE%" -m uvicorn tally_api:app --port 8000
+
+cd /d "%PROJECT_ROOT%"
+start "" "%PYTHONW_EXE%" -m uvicorn app.main:app --port 8001
 
 echo [LAUNCHING] Starting VoiceTally System Tray Application...
 echo The window will appear momentarily.
