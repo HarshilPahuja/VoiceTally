@@ -63,11 +63,8 @@ FOR /F "tokens=5" %%T IN ('netstat -ano ^| findstr :8000') DO taskkill /PID %%T 
 FOR /F "tokens=5" %%T IN ('netstat -ano ^| findstr :8001') DO taskkill /PID %%T /F >nul 2>&1
 
 echo [LAUNCHING] Starting Backend API Servers silently...
-cd /d "%PROJECT_ROOT%\extracting_tally_data"
-start "" "%PYTHONW_EXE%" -m uvicorn tally_api:app --port 8000
-
-cd /d "%PROJECT_ROOT%"
-start "" "%PYTHONW_EXE%" -m uvicorn app.main:app --port 8001
+powershell -WindowStyle Hidden -Command "Start-Process '%PYTHON_EXE%' -ArgumentList '-m', 'uvicorn', 'tally_api:app', '--port', '8000' -WorkingDirectory '%PROJECT_ROOT%\extracting_tally_data' -WindowStyle Hidden"
+powershell -WindowStyle Hidden -Command "Start-Process '%PYTHON_EXE%' -ArgumentList '-m', 'uvicorn', 'app.main:app', '--port', '8001' -WorkingDirectory '%PROJECT_ROOT%' -WindowStyle Hidden"
 
 echo [LAUNCHING] Starting VoiceTally System Tray Application...
 echo The window will appear momentarily.
