@@ -23,7 +23,6 @@
     Parts  : VTLaunchPart
     Height : 25% Screen
     Width  : 45% Screen
-    Width  : 45% Screen
 
 [Part: VTLaunchPart]
     Lines : VTLine1, VTBlank1, VTLine2, VTLine3
