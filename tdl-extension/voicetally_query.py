@@ -430,7 +430,38 @@ class VoiceTallyApp:
 
     # ── Run ──────────────────────────────────────────────────────
 
+    def _add_to_startup(self):
+        if sys.platform != "win32":
+            return
+        
+        try:
+            import winreg
+            key = winreg.HKEY_CURRENT_USER
+            sub_key = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+            # Use pythonw to prevent command window from flashing on boot
+            pythonw_exe = sys.executable.replace("python.exe", "pythonw.exe")
+            script_path = os.path.abspath(__file__)
+            
+            # The exact command to run silently
+            cmd = f'"{pythonw_exe}" "{script_path}"'
+
+            registry_key = winreg.OpenKey(key, sub_key, 0, winreg.KEY_ALL_ACCESS)
+            try:
+                # If it already exists, do nothing (respects Task Manager disabling)
+                winreg.QueryValueEx(registry_key, "VoiceTally")
+            except FileNotFoundError:
+                # Create it for the first time
+                winreg.SetValueEx(registry_key, "VoiceTally", 0, winreg.REG_SZ, cmd)
+                
+            winreg.CloseKey(registry_key)
+        except Exception as e:
+            print(f"Could not add to Windows Startup: {e}")
+
     def run(self):
+        # Ensure it boots automatically on next restart
+        self._add_to_startup()
+
         # Setup tray icon
         self.setup_tray()
 
