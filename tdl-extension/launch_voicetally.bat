@@ -2,6 +2,7 @@
 setlocal enabledelayedexpansion
 title VoiceTally Installer ^& Launcher
 
+<<<<<<< HEAD
 echo ===================================================
 echo     VoiceTally Auto-Installer ^& Launcher
 echo ===================================================
@@ -67,3 +68,12 @@ echo.
 start "" "%PYTHONW_EXE%" "%SCRIPT_DIR%voicetally_query.py" --show
 
 exit /b 0
+=======
+@REM need ffmpeg for whisper
+
+echo Checking and installing required audio packages...
+pip install sounddevice soundfile --quiet
+
+cd /d "%~dp0"
+start "" pythonw "%~dp0voicetally_query.py" --show
+>>>>>>> 93745a479f8b4eaab02211fcca151b58ce2ea641
