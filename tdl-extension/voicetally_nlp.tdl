@@ -64,8 +64,9 @@
 ;; ─── Function to launch the batch file (Unsupported in EDU) ───
 
 ;; [Function: VTTryLaunch]
-;;     01 : Exec Command : "cmd /c start """" ""d:\Projects\chopped\VoiceTally\tdl-extension\launch_voicetally.bat"""
+;;     01 : Exec Command : "cmd /c start """" "".\launch_voicetally.bat"""
 
 ;; =====================================================================
 ;; END
 ;; =====================================================================
+
