@@ -267,6 +267,12 @@ def extract_day_book():
             []
         )
 
+        # Format date for day_book metadata (for ChromaDB date filtering)
+        try:
+            fmt_day_date = datetime.strptime(v_date, "%Y%m%d").strftime("%Y-%m-%d")
+        except ValueError:
+            fmt_day_date = v_date
+
         if entries:
             for entry in entries:
                 ledger = (entry.findtext("LEDGERNAME") or "").strip()
@@ -275,22 +281,24 @@ def extract_day_book():
                 except (ValueError, TypeError):
                     amount = 0.0
 
-                doc = (f"{v_type} voucher {v_number} on {v_date} for {party}. "
+                doc = (f"{v_type} voucher {v_number} on {fmt_day_date} for {party}. "
                        f"Ledger: {ledger}. Amount: {amount}. Narration: {narration}")
                 docs.append(doc)
                 metas.append({
                     "voucher_type": v_type, "voucher_number": v_number,
                     "party": party, "ledger": ledger, "amount": amount,
+                    "date": fmt_day_date,  # enables from_date/to_date filtering
                 })
                 ids.append(generate_id(doc))
         else:
             # No ledger entries found — store voucher header at minimum
-            doc = (f"{v_type} voucher {v_number} on {v_date} for {party}. "
+            doc = (f"{v_type} voucher {v_number} on {fmt_day_date} for {party}. "
                    f"Narration: {narration}")
             docs.append(doc)
             metas.append({
                 "voucher_type": v_type, "voucher_number": v_number,
                 "party": party, "ledger": "", "amount": 0.0,
+                "date": fmt_day_date,  # enables from_date/to_date filtering
             })
             ids.append(generate_id(doc))
 

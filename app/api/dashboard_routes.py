@@ -33,6 +33,9 @@ def fig_to_base64(fig):
 async def get_dashboard_visuals(theme: str = "light"):
     client = get_db()
     
+    if not client:
+        return {"status": "error", "message": "Could not connect to database"}
+
     # 1. Fetch data from Chroma DB collections
     day_book = client.get_or_create_collection("day_book").get()
     sales = client.get_or_create_collection("sales").get()
@@ -122,9 +125,7 @@ async def get_dashboard_visuals(theme: str = "light"):
         if 'group' in df_ld.columns:
             cap_ass = df_ld[df_ld['group'].str.contains('Capital|Asset', case=False, na=False)]
             if not cap_ass.empty:
-                _, _, autotexts = cap_ass.groupby('group').size().plot(kind='pie', autopct='%1.1f%%', colors=color_palette, ax=ax)
-                for autotext in autotexts:
-                    autotext.set_color('white')
+                cap_ass.groupby('group').size().plot(kind='pie', autopct='%1.1f%%', colors=color_palette, ax=ax, textprops={'color': 'white'})
     ax.set_title("Capital & Assets Ledgers")
     ax.set_ylabel("")
     charts['capital_assets'] = fig_to_base64(fig)

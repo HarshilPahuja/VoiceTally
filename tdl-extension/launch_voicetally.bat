@@ -53,25 +53,35 @@ echo [SETUP] Installing and verifying Python dependencies...
 if exist "%PROJECT_ROOT%\requirements.txt" (
     "%PYTHON_EXE%" -m pip install -r "%PROJECT_ROOT%\requirements.txt" >nul 2>&1
 )
-"%PYTHON_EXE%" -m pip install pystray Pillow keyboard sounddevice soundfile requests httpx >nul 2>&1
 echo [OK] All dependencies are satisfied.
 
 :: 5. Launch Application and Backend Servers
 echo.
 echo [MAINTENANCE] Closing any stale background servers...
-FOR /F "tokens=5" %%T IN ('netstat -ano ^| findstr :8000') DO taskkill /PID %%T /F >nul 2>&1
-FOR /F "tokens=5" %%T IN ('netstat -ano ^| findstr :8001') DO taskkill /PID %%T /F >nul 2>&1
+powershell -Command "Get-NetTCPConnection -LocalPort 8000,8001 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }"
 
-echo [LAUNCHING] Starting Backend API Servers silently...
-powershell -WindowStyle Hidden -Command "Start-Process '%PYTHON_EXE%' -ArgumentList '-m', 'uvicorn', 'tally_api:app', '--port', '8000' -WorkingDirectory '%PROJECT_ROOT%\extracting_tally_data' -WindowStyle Hidden"
-powershell -WindowStyle Hidden -Command "Start-Process '%PYTHON_EXE%' -ArgumentList '-m', 'uvicorn', 'app.main:app', '--port', '8001' -WorkingDirectory '%PROJECT_ROOT%' -WindowStyle Hidden"
+
+echo [LAUNCHING] Starting Backend API Servers...
+pushd "%PROJECT_ROOT%\extracting_tally_data"
+start "VoiceTally-DataAPI" /MIN "%PYTHON_EXE%" -m uvicorn tally_api:app --port 8000
+popd
+start "VoiceTally-NLP" /MIN /D "%PROJECT_ROOT%" "%PYTHON_EXE%" -m uvicorn app.main:app --port 8001
+timeout /t 3 /nobreak >nul
+
 
 echo [LAUNCHING] Starting VoiceTally System Tray Application...
 echo The window will appear momentarily.
 echo Press Ctrl+Shift+V to open the query window from anywhere.
 echo.
 
-:: Start silently using pythonw, parsing relative paths perfectly!
+:: Fix for Python 3.13 venv Tcl/Tk path issue on Windows:
+:: The venv loses the TCL_LIBRARY/TK_LIBRARY paths, causing tkinter to crash silently.
+:: We detect the system Python's tcl/tk folder and export the env vars before launch.
+FOR /F "delims=" %%P IN ('python -c "import sys,os; base=os.path.dirname(sys.executable); print(base)"') DO set "SYS_PYTHON_BASE=%%P"
+FOR /D %%D IN ("%SYS_PYTHON_BASE%\tcl\tcl8.*") DO set "TCL_LIBRARY=%%D"
+FOR /D %%D IN ("%SYS_PYTHON_BASE%\tcl\tk8.*")  DO set "TK_LIBRARY=%%D"
+
+:: Launch the UI — use pythonw for silent background, with TCL paths now set
 start "" "%PYTHONW_EXE%" "%SCRIPT_DIR%voicetally_query.py" --show
 
 exit /b 0

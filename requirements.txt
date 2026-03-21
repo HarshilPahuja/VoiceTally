@@ -1,12 +1,29 @@
+# Everything needed for this project is present here
+
+# ── NLP / Intelligence layer (app/, port 8001) ───────────────
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
 pydantic-settings
 python-dotenv
+python-multipart
 langdetect
-jinja2
-reportlab
+httpx
+openai-whisper
+
+# ── Dashboard charts & PDF reports (app/dashboard_routes, report_engine) ──
 pandas
 matplotlib
-openai-whisper
-python-multipart
+jinja2
+reportlab
+
+# ── Data extraction layer (extracting_tally_data/, port 8000) ─
+chromadb>=0.6.0
+requests>=2.31.0
+
+# ── TDL extension UI (tdl-extension/voicetally_query.py) ──────
+pystray
+Pillow
+keyboard
+sounddevice
+soundfile

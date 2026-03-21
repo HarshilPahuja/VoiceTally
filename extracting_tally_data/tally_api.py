@@ -91,7 +91,7 @@ def get_tally_last_altered() -> str | None:
   <BODY>
     <EXPORTDATA>
       <REQUESTDESC>
-        <REPORTNAME>List of Companies</REPORTNAME>
+        <REPORTNAME>List of Accounts</REPORTNAME>
         <STATICVARIABLES>
           <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
         </STATICVARIABLES>
@@ -104,7 +104,8 @@ def get_tally_last_altered() -> str | None:
         return None
 
     # Try to find a timestamp that changes when data is altered
-    for tag in ["LASTINVENTORYENTRYDATE", "LASTVOUCHERDATE", "LASTMASTERALTEREDDATE"]:
+    # In TallyPrime, we look for Bill Dates from the List of Accounts
+    for tag in ["LASTINVENTORYENTRYDATE", "LASTVOUCHERDATE", "LASTMASTERALTEREDDATE", "BILLDATE"]:
         val = root.findtext(f".//{tag}")
         if val:
             return val.strip()
