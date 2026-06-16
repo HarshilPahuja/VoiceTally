@@ -1,0 +1,1044 @@
+[STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[Security] Rate Limit: 100 reqs / 1 min
+2026-02-12 11:13:26.3319021 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_16_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.3326988 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Shape_4_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.3712319 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.3722842 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_12_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.3733004 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_9_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.3740975 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_10_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.3747678 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_11_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.3757870 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.3766138 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5030126 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/activation_fn/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5037951 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/activation_fn/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5045413 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/activation_fn/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5054108 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/activation_fn/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5065852 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/activation_fn/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5077197 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/activation_fn/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5087426 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/activation_fn/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5097088 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/activation_fn/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5108946 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/activation_fn/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5116561 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/activation_fn/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5124193 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/activation_fn/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5131632 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/activation_fn/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5142100 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/activation_fn/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5149596 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/activation_fn/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5157261 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/activation_fn/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5164685 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/activation_fn/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5172285 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/activation_fn/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5179689 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/activation_fn/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5187118 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/activation_fn/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5194638 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/activation_fn/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5203571 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/activation_fn/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5212636 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/activation_fn/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5221406 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/activation_fn/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5228978 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/activation_fn/Constant_2_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5541816 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/encoder_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5551417 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/self_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5559025 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/encoder_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5566758 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/final_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5576419 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/self_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5584041 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/self_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5591593 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/encoder_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5600064 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/final_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5609514 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/final_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5618754 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/self_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5626361 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/self_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5633927 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5640954 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5648151 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/self_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5655897 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/encoder_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5663588 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/final_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5671024 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/final_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5678492 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/self_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5686133 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/encoder_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5695917 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/encoder_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5705378 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/final_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5715165 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/final_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5723755 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/self_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5731506 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/encoder_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5739126 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/encoder_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5746873 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/final_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5757171 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/final_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5766501 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/self_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5774033 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5781123 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5788751 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/self_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5796447 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/final_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5806222 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/self_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5814033 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/encoder_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5821953 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/final_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5829587 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.0/encoder_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5837276 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/self_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5844881 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/self_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5861551 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/encoder_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5873131 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/encoder_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5884598 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/final_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5895660 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.1/final_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5909100 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/self_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5920809 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/encoder_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5932071 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/encoder_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5943579 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/final_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5954613 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.2/final_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5963416 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/self_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5970938 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/self_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5978638 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/encoder_attn_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5986266 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/encoder_attn_layer_norm/Constant_1_output_0'. It is not used by any node and should be removed from the model.
+2026-02-12 11:13:26.5996294 [W:onnxruntime:, graph.cc:3490 onnxruntime::Graph::CleanUnusedInitializersAndNodeArgs] Removing initializer '/model/decoder/layers.3/final_layer_norm/Constant_output_0'. It is not used by any node and should be removed from the model.
+[STT] Model loaded successfully.
+[STT] Transcribed: ""
+^C[2026-03-04 00:50:46] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-04 00:50:47] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-04 00:50:47] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-04 00:50:48] info: [STT] Model loaded successfully.
+[2026-03-04 00:50:48] info: Incoming request: OPTIONS /api/auth/login from 127.0.0.1
+[2026-03-04 00:50:48] info: Request succeeded: OPTIONS /api/auth/login - Status: 200
+[2026-03-04 00:50:48] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-04 00:50:48] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-04 00:50:48] info: Incoming request: OPTIONS /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:50:48] info: Request succeeded: OPTIONS /api/admin/audit-logs - Status: 200
+[2026-03-04 00:50:48] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:50:48] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-04 00:51:11] info: Incoming request: OPTIONS /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:51:11] info: Request succeeded: OPTIONS /api/admin/audit-logs - Status: 200
+[2026-03-04 00:51:11] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:51:11] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 00:52:03] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 00:52:03] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 00:52:06] info: Incoming request: OPTIONS /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:52:06] info: Request succeeded: OPTIONS /api/admin/audit-logs - Status: 200
+[2026-03-04 00:52:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:52:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-04 00:52:19] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-04 00:52:19] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-04 00:52:22] info: Incoming request: OPTIONS /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:52:22] info: Request succeeded: OPTIONS /api/admin/audit-logs - Status: 200
+[2026-03-04 00:52:22] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:52:22] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-04 00:52:33] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-04 00:52:33] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-04 00:52:34] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-04 00:52:34] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-04 00:52:36] info: Incoming request: OPTIONS /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:52:36] info: Request succeeded: OPTIONS /api/admin/audit-logs - Status: 200
+[2026-03-04 00:52:36] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:52:36] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-04 00:52:42] info: Incoming request: OPTIONS /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:52:42] info: Request succeeded: OPTIONS /api/admin/audit-logs - Status: 200
+[2026-03-04 00:52:42] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:52:42] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 00:53:04] info: Incoming request: OPTIONS /api/auth/login from 127.0.0.1
+[2026-03-04 00:53:04] info: Request succeeded: OPTIONS /api/auth/login - Status: 200
+[2026-03-04 00:53:04] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-04 00:53:04] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-04 00:53:04] info: Incoming request: OPTIONS /api/user/history from 127.0.0.1
+[2026-03-04 00:53:04] info: Request succeeded: OPTIONS /api/user/history - Status: 200
+[2026-03-04 00:53:05] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 00:53:05] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-04 00:53:06] info: Incoming request: OPTIONS /api/user/history from 127.0.0.1
+[2026-03-04 00:53:06] info: Request succeeded: OPTIONS /api/user/history - Status: 200
+[2026-03-04 00:53:06] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 00:53:06] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 00:53:31] info: Incoming request: OPTIONS /api/auth/login from 127.0.0.1
+[2026-03-04 00:53:31] info: Request succeeded: OPTIONS /api/auth/login - Status: 200
+[2026-03-04 00:53:31] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-04 00:53:31] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-04 00:53:31] info: Incoming request: OPTIONS /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:53:31] info: Request succeeded: OPTIONS /api/admin/audit-logs - Status: 200
+[2026-03-04 00:53:31] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:53:31] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-04 00:53:36] info: Incoming request: OPTIONS /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:53:36] info: Request succeeded: OPTIONS /api/admin/audit-logs - Status: 200
+[2026-03-04 00:53:36] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 00:53:36] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 17:50:16] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-04 17:50:20] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-04 17:50:20] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-04 17:50:22] info: [STT] Model loaded successfully.
+[2026-03-04 19:38:52] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-04 19:38:53] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-04 19:38:53] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-04 19:38:55] info: [STT] Model loaded successfully.
+[2026-03-04 19:39:21] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:39:21] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:39:28] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-04 19:39:28] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-04 19:39:34] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-04 19:39:34] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-04 19:39:48] info: Incoming request: GET /health from 127.0.0.1
+[2026-03-04 19:39:48] info: Request succeeded: GET /health - Status: 200
+[2026-03-04 19:39:52] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-04 19:39:52] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-04 19:39:57] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-04 19:39:57] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-04 19:40:03] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:03] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:27] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:27] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:29] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:29] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:29] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:29] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:29] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:29] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:30] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:30] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:30] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:30] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:30] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:30] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:30] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:30] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:30] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:30] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:30] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:30] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:31] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:31] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:40:31] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:40:31] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:41:50] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:41:50] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:42:27] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-04 19:42:27] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-04 19:42:27] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:42:27] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-04 19:43:14] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:43:14] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:43:24] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:43:24] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:43:28] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:43:28] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:43:31] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:43:31] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-04 19:44:18] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-04 19:44:18] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-04 19:44:19] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:44:19] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-04 19:44:37] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:44:37] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:44:39] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-04 19:44:39] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-04 19:44:42] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:44:42] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 19:44:42] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:44:42] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 19:44:43] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:44:43] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 19:44:47] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:44:47] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-04 19:44:49] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:44:49] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 19:47:43] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:47:43] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 19:47:44] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:47:44] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 19:48:58] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:48:58] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 19:49:00] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:49:00] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 19:49:01] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:49:01] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 19:49:08] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:49:08] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 19:49:08] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-04 19:49:08] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-04 19:49:49] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:49:49] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 19:49:52] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:49:52] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 19:51:25] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:51:25] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-04 19:51:25] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-04 19:51:25] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-07 23:29:51] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-07 23:29:58] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-07 23:29:58] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-07 23:30:22] info: [STT] Model loaded successfully.
+[2026-03-07 23:31:03] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:31:03] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-07 23:32:20] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:32:20] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-07 23:32:38] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-07 23:32:38] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-07 23:32:44] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-07 23:32:44] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-07 23:32:47] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:32:47] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-07 23:33:06] info: Incoming request: GET /health from 127.0.0.1
+[2026-03-07 23:33:06] info: Request succeeded: GET /health - Status: 200
+[2026-03-07 23:33:10] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:33:10] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-07 23:36:00] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:36:00] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-07 23:36:06] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:36:06] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-07 23:36:17] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:36:17] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-07 23:36:40] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-07 23:36:41] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-07 23:36:41] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-07 23:36:41] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-07 23:37:18] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-07 23:37:18] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-07 23:37:18] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-07 23:37:18] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-07 23:37:34] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-07 23:37:34] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-07 23:43:54] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-07 23:43:54] info: Request succeeded: GET /sales?period=year - Status: 200
+[2026-03-07 23:44:49] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:44:49] info: Request succeeded: GET /sales? - Status: 200
+[2026-03-07 23:45:03] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-07 23:45:03] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-07 23:45:15] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-07 23:45:15] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-07 23:45:37] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-07 23:45:37] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-07 23:45:55] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-07 23:45:55] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-07 23:54:19] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-07 23:54:19] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-07 23:54:37] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-07 23:54:37] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 00:11:17] info: Incoming request: GET /sales?period=year&status=pending from 127.0.0.1
+[2026-03-08 00:11:17] info: Request succeeded: GET /sales?period=year&status=pending - Status: 200
+[2026-03-08 00:11:30] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 00:11:30] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-08 00:11:53] info: Incoming request: GET /sales?period=month from 127.0.0.1
+[2026-03-08 00:11:53] info: Request succeeded: GET /sales?period=month - Status: 200
+[2026-03-08 00:12:16] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 00:12:16] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-08 00:12:22] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 00:12:22] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 12:28:43] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-08 12:28:47] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-08 12:28:47] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-08 12:28:51] info: [STT] Model loaded successfully.
+[2026-03-08 13:54:05] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-08 13:54:06] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-08 13:54:06] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-08 13:54:08] info: [STT] Model loaded successfully.
+[2026-03-08 13:57:24] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 13:57:24] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 14:07:13] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-08 14:07:13] info: Request succeeded: GET /sales?status=paid - Status: 200
+[2026-03-08 14:07:19] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:07:19] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:07:24] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:07:24] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:07:27] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:07:27] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:07:37] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:07:37] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:07:42] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-08 14:07:42] info: Request succeeded: GET /sales?status=paid - Status: 304
+[2026-03-08 14:07:55] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:07:55] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:09:58] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:09:58] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:10:03] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-08 14:10:03] info: Request succeeded: GET /sales?status=paid - Status: 304
+[2026-03-08 14:10:08] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:10:08] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:10:13] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 14:10:13] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 14:15:42] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 14:15:42] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 14:34:54] info: Incoming request: GET /sales?period=week from 127.0.0.1
+[2026-03-08 14:34:54] info: Request succeeded: GET /sales?period=week - Status: 200
+[2026-03-08 14:44:00] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:44:00] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:44:03] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:44:03] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:44:06] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 14:44:06] info: Request succeeded: GET /sales? - Status: 200
+[2026-03-08 14:44:16] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 14:44:16] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 14:44:21] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-08 14:44:21] info: Request succeeded: GET /sales?status=paid - Status: 200
+[2026-03-08 14:44:30] info: Incoming request: GET /sales?period=week from 127.0.0.1
+[2026-03-08 14:44:30] info: Request succeeded: GET /sales?period=week - Status: 200
+[2026-03-08 14:44:48] info: Incoming request: GET /sales?period=month from 127.0.0.1
+[2026-03-08 14:44:48] info: Request succeeded: GET /sales?period=month - Status: 200
+[2026-03-08 14:45:26] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 14:45:26] info: Request succeeded: GET /sales?period=year - Status: 200
+[2026-03-08 14:45:27] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 14:45:27] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-08 14:45:35] info: Incoming request: GET /sales?period=month from 127.0.0.1
+[2026-03-08 14:45:35] info: Request succeeded: GET /sales?period=month - Status: 304
+[2026-03-08 14:45:54] info: Incoming request: GET /sales?period=month from 127.0.0.1
+[2026-03-08 14:45:54] info: Request succeeded: GET /sales?period=month - Status: 200
+[2026-03-08 14:45:55] info: Incoming request: GET /favicon.ico from 127.0.0.1
+[2026-03-08 14:45:55] warn: Request failed: GET /favicon.ico - Status: 404
+[2026-03-08 15:04:57] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 15:04:57] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-08 15:05:03] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 15:05:03] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 15:05:09] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 15:05:09] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 15:05:14] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 15:05:14] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 15:05:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 15:05:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 15:05:33] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 15:05:33] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 15:05:39] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 15:05:39] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 15:05:46] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-08 15:05:46] info: Request succeeded: GET /sales?status=paid - Status: 304
+[2026-03-08 15:06:28] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 15:06:28] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 15:06:40] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 15:06:40] info: Request succeeded: GET /sales?status=pending - Status: 200
+[2026-03-08 15:06:55] info: Incoming request: GET /sales?status=unpaid from 127.0.0.1
+[2026-03-08 15:06:55] info: Request succeeded: GET /sales?status=unpaid - Status: 200
+[2026-03-08 15:07:17] info: Incoming request: GET /sales?status=unpaid from 127.0.0.1
+[2026-03-08 15:07:17] info: Request succeeded: GET /sales?status=unpaid - Status: 200
+[2026-03-08 15:07:30] info: Incoming request: GET /sales?status=processing from 127.0.0.1
+[2026-03-08 15:07:30] info: Request succeeded: GET /sales?status=processing - Status: 200
+[2026-03-08 15:53:45] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-08 15:53:51] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-08 15:53:51] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-08 15:53:56] info: [STT] Model loaded successfully.
+[2026-03-08 15:53:56] info: Incoming request: GET /sales?status=unpaid from 127.0.0.1
+[2026-03-08 15:53:56] info: Request succeeded: GET /sales?status=unpaid - Status: 304
+[2026-03-08 15:54:05] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-08 15:54:05] info: Request succeeded: GET /sales?status=paid - Status: 304
+[2026-03-08 16:07:08] info: Incoming request: GET /sales?status=unpaid from 127.0.0.1
+[2026-03-08 16:07:08] info: Request succeeded: GET /sales?status=unpaid - Status: 304
+[2026-03-08 16:07:20] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-08 16:07:20] info: Request succeeded: GET /sales?status=paid - Status: 304
+[2026-03-08 16:39:02] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-08 16:39:03] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-08 16:39:03] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-08 16:39:03] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-08 16:41:09] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-08 16:41:09] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-08 16:41:33] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-08 16:41:33] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-08 16:41:33] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-08 16:41:33] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-08 16:42:34] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-08 16:42:34] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-08 16:42:34] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-08 16:42:34] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-08 16:42:42] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-08 16:42:42] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-08 16:42:54] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 16:42:54] info: Request succeeded: GET /sales?status=pending - Status: 200
+[2026-03-08 16:43:13] info: Incoming request: GET /sales?status=unpaid from 127.0.0.1
+[2026-03-08 16:43:13] info: Request succeeded: GET /sales?status=unpaid - Status: 304
+[2026-03-08 16:43:21] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 16:43:21] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-08 16:43:46] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 16:43:46] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-08 16:43:57] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-08 16:43:57] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-08 16:44:08] info: Incoming request: GET /sales?period=week from 127.0.0.1
+[2026-03-08 16:44:08] info: Request succeeded: GET /sales?period=week - Status: 304
+[2026-03-08 16:44:16] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 16:44:16] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-08 16:44:19] info: Incoming request: GET /sales?period=year&status=paid from 127.0.0.1
+[2026-03-08 16:44:19] info: Request succeeded: GET /sales?period=year&status=paid - Status: 200
+[2026-03-08 16:44:23] info: Incoming request: GET /sales?period=year&status=pending from 127.0.0.1
+[2026-03-08 16:44:23] info: Request succeeded: GET /sales?period=year&status=pending - Status: 200
+[2026-03-08 16:49:47] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-08 16:49:47] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-08 16:51:15] info: Incoming request: GET /sales?period=year from 127.0.0.1
+[2026-03-08 16:51:15] info: Request succeeded: GET /sales?period=year - Status: 304
+[2026-03-13 12:23:12] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-13 12:23:20] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-13 12:23:23] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-13 12:23:23] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-13 12:23:28] info: [STT] Model loaded successfully.
+[2026-03-13 12:24:59] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 12:24:59] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 12:24:59] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:24:59] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-13 12:25:01] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-13 12:25:02] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-13 12:25:02] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-13 12:25:05] info: [STT] Model loaded successfully.
+[2026-03-13 12:27:08] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 12:27:08] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 12:27:08] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-13 12:27:08] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-13 12:34:00] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-13 12:34:00] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-13 12:39:24] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:39:24] warn: Request failed: GET /api/admin/audit-logs - Status: 403
+[2026-03-13 12:47:27] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 12:47:27] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 12:47:27] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:47:27] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-13 12:48:30] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 12:48:30] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 12:48:30] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-13 12:48:30] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-13 12:48:59] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-13 12:48:59] info: Request succeeded: GET /sales?status=paid - Status: 304
+[2026-03-13 12:49:06] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 12:49:06] info: Request succeeded: GET /sales? - Status: 200
+[2026-03-13 12:49:19] info: Incoming request: GET /sales?status=pending from 127.0.0.1
+[2026-03-13 12:49:19] info: Request succeeded: GET /sales?status=pending - Status: 304
+[2026-03-13 12:49:24] info: Incoming request: GET /sales?status=processing from 127.0.0.1
+[2026-03-13 12:49:24] info: Request succeeded: GET /sales?status=processing - Status: 304
+[2026-03-13 12:49:26] info: Incoming request: GET /sales?status=unpaid from 127.0.0.1
+[2026-03-13 12:49:26] info: Request succeeded: GET /sales?status=unpaid - Status: 304
+[2026-03-13 12:49:30] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-13 12:49:30] info: Request succeeded: GET /sales?status=paid - Status: 304
+[2026-03-13 12:49:33] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 12:49:33] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 12:49:52] info: Incoming request: GET /sales?customer=customerA from 127.0.0.1
+[2026-03-13 12:49:52] info: Request succeeded: GET /sales?customer=customerA - Status: 200
+[2026-03-13 12:50:04] info: Incoming request: GET /sales?customer=Customer+A from 127.0.0.1
+[2026-03-13 12:50:04] info: Request succeeded: GET /sales?customer=Customer+A - Status: 200
+[2026-03-13 12:50:29] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:50:29] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-13 12:50:41] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 12:50:41] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 12:51:20] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 12:51:20] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 12:51:20] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:51:20] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-13 12:53:47] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:53:47] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:53:51] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:53:51] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:53:52] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:53:52] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:08] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:08] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:08] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:08] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:08] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:08] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:08] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:08] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:08] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:08] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:09] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:09] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:09] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:09] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 12:54:09] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 12:54:09] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 13:14:33] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-13 13:14:36] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-13 13:14:36] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-13 13:14:38] info: [STT] Model loaded successfully.
+[2026-03-13 13:15:14] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 13:15:14] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 13:15:29] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 13:15:29] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 13:15:46] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 13:15:46] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 13:39:12] info: Incoming request: GET /sales?period=week from 127.0.0.1
+[2026-03-13 13:39:12] info: Request succeeded: GET /sales?period=week - Status: 200
+[2026-03-13 13:39:24] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 13:39:24] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 13:39:44] info: Incoming request: GET /sales?period=week&status=unpaid from 127.0.0.1
+[2026-03-13 13:39:44] info: Request succeeded: GET /sales?period=week&status=unpaid - Status: 200
+[2026-03-13 13:40:05] info: Incoming request: GET /sales?status=unpaid from 127.0.0.1
+[2026-03-13 13:40:05] info: Request succeeded: GET /sales?status=unpaid - Status: 304
+[2026-03-13 20:25:56] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-13 20:26:01] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-13 20:26:01] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-13 20:26:04] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-13 20:26:06] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-13 20:26:06] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-13 20:26:10] info: [STT] Model loaded successfully.
+[2026-03-13 20:28:41] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 20:28:42] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 20:28:42] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 20:28:42] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-13 20:28:43] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-13 20:28:44] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-13 20:28:44] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-13 20:28:47] info: [STT] Model loaded successfully.
+[2026-03-13 20:29:13] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 20:29:13] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 20:29:18] info: Incoming request: GET /sales?status=paid from 127.0.0.1
+[2026-03-13 20:29:18] info: Request succeeded: GET /sales?status=paid - Status: 304
+[2026-03-13 20:29:22] info: Incoming request: GET /sales?status=unpaid from 127.0.0.1
+[2026-03-13 20:29:22] info: Request succeeded: GET /sales?status=unpaid - Status: 304
+[2026-03-13 20:29:37] info: Incoming request: GET /sales?status=unpaid&customer=Customer+C from 127.0.0.1
+[2026-03-13 20:29:37] info: Request succeeded: GET /sales?status=unpaid&customer=Customer+C - Status: 200
+[2026-03-13 20:30:07] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 20:30:07] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 20:30:07] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-13 20:30:07] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-13 20:32:45] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 20:32:45] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 20:34:26] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 20:34:26] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 21:01:30] info: Incoming request: GET / from 127.0.0.1
+[2026-03-13 21:01:30] warn: Request failed: GET / - Status: 404
+[2026-03-13 21:01:35] info: Incoming request: GET /sales from 127.0.0.1
+[2026-03-13 21:01:35] info: Request succeeded: GET /sales - Status: 200
+[2026-03-13 21:01:35] info: Incoming request: GET /favicon.ico from 127.0.0.1
+[2026-03-13 21:01:35] warn: Request failed: GET /favicon.ico - Status: 404
+[2026-03-13 21:01:41] info: Incoming request: GET /sales from 127.0.0.1
+[2026-03-13 21:01:41] info: Request succeeded: GET /sales - Status: 304
+[2026-03-13 21:01:42] info: Incoming request: GET /sales from 127.0.0.1
+[2026-03-13 21:01:42] info: Request succeeded: GET /sales - Status: 304
+[2026-03-13 21:01:42] info: Incoming request: GET /sales from 127.0.0.1
+[2026-03-13 21:01:42] info: Request succeeded: GET /sales - Status: 304
+[2026-03-13 21:01:42] info: Incoming request: GET /sales from 127.0.0.1
+[2026-03-13 21:01:42] info: Request succeeded: GET /sales - Status: 304
+[2026-03-13 21:06:04] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 21:06:04] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 21:06:04] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 21:06:04] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-13 21:08:16] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 21:08:16] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 21:09:19] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 21:09:19] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 21:15:16] info: Incoming request: GET /sales from 127.0.0.1
+[2026-03-13 21:15:16] info: Request succeeded: GET /sales - Status: 304
+[2026-03-13 21:20:05] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-13 21:20:05] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-13 21:20:56] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-13 21:20:56] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-13 21:20:56] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 21:20:56] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-13 21:21:00] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 21:21:00] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-13 21:21:01] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-13 21:21:01] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-14 00:05:34] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-14 00:05:37] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-14 00:05:37] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-14 00:05:39] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-14 00:05:40] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-14 00:05:40] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-14 00:05:42] info: [STT] Model loaded successfully.
+[2026-03-14 00:05:53] info: Incoming request: GET / from 127.0.0.1
+[2026-03-14 00:05:53] warn: Request failed: GET / - Status: 404
+[2026-03-14 23:12:25] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-14 23:12:29] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-14 23:12:29] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-14 23:12:30] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-14 23:12:31] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-14 23:12:31] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-14 23:12:33] info: [STT] Model loaded successfully.
+[2026-03-14 23:16:38] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:16:38] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:19:39] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-14 23:19:39] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-14 23:19:39] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:19:39] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-14 23:19:41] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-14 23:19:41] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-14 23:19:41] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-14 23:19:43] info: [STT] Model loaded successfully.
+[2026-03-14 23:25:04] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:25:04] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-14 23:25:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:25:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-14 23:25:21] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:25:21] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-14 23:26:44] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:26:44] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-14 23:26:45] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:26:45] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-14 23:28:34] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:28:34] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-14 23:34:01] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:34:02] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-14 23:37:39] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:37:39] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:37:51] info: Incoming request: GET /sales?customer=unpaid from 127.0.0.1
+[2026-03-14 23:37:51] info: Request succeeded: GET /sales?customer=unpaid - Status: 200
+[2026-03-14 23:38:00] info: Incoming request: GET /sales?customer=processing from 127.0.0.1
+[2026-03-14 23:38:00] info: Request succeeded: GET /sales?customer=processing - Status: 200
+[2026-03-14 23:38:06] info: Incoming request: GET /sales?customer=sales from 127.0.0.1
+[2026-03-14 23:38:06] info: Request succeeded: GET /sales?customer=sales - Status: 200
+[2026-03-14 23:38:06] info: Incoming request: GET /sales?customer=sales from 127.0.0.1
+[2026-03-14 23:38:06] info: Request succeeded: GET /sales?customer=sales - Status: 304
+[2026-03-14 23:38:10] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:38:10] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:38:24] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:38:24] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:38:48] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-14 23:38:48] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-14 23:38:48] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:38:48] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-14 23:39:56] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:39:56] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-14 23:53:48] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:53:48] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:53:49] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:53:49] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:53:49] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:53:49] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:53:49] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:53:49] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:53:59] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-14 23:53:59] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-14 23:54:03] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-14 23:54:03] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-14 23:54:31] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-14 23:54:31] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-14 23:54:31] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-14 23:54:31] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-14 23:57:48] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-14 23:57:50] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-14 23:57:50] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-14 23:57:51] info: [STT] Model loaded successfully.
+[2026-03-15 00:01:24] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-15 00:01:24] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-15 00:03:23] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-15 00:03:23] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-15 00:05:19] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-15 00:05:19] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-15 00:43:31] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-15 00:43:31] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-15 10:53:28] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-15 10:53:32] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-15 10:53:32] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-15 10:53:34] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-15 10:53:35] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-15 10:53:35] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-15 10:53:38] info: [STT] Model loaded successfully.
+[2026-03-15 21:05:10] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-15 21:05:12] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-15 21:05:12] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-15 21:05:13] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-15 21:05:14] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-15 21:05:14] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-15 21:05:16] info: [STT] Model loaded successfully.
+[2026-03-15 21:08:24] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-15 21:08:24] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-15 21:09:05] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-15 21:09:06] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-15 21:09:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-15 21:09:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-15 21:09:07] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-15 21:09:09] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-15 21:09:09] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-15 21:09:11] info: [STT] Model loaded successfully.
+[2026-03-15 21:13:31] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-15 21:13:31] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-15 21:13:32] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-15 21:13:32] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:00:01] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-17 13:00:04] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-17 13:00:04] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-17 13:00:05] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-17 13:00:06] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-17 13:00:06] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-17 13:00:06] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-17 13:00:07] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-17 13:00:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:00:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-17 13:00:08] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-17 13:00:09] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-17 13:00:09] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-17 13:00:11] info: [STT] Model loaded successfully.
+[2026-03-17 13:00:18] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:00:18] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-17 13:00:19] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:00:19] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:00:20] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:00:20] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:00:21] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:00:21] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:02:38] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-17 13:02:38] info: Request succeeded: GET /sales? - Status: 200
+[2026-03-17 13:03:02] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-17 13:03:02] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-17 13:03:02] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:03:02] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-17 13:09:37] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-17 13:09:37] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-17 13:09:37] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:09:37] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-17 13:09:49] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-17 13:09:49] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-17 13:09:49] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:09:49] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-17 13:10:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:10:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-17 13:10:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:10:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:10:08] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:10:08] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:10:09] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:10:09] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:12:16] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:12:16] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-17 13:12:20] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:12:20] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:12:21] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:12:21] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:12:51] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:12:51] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:12:56] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:12:56] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:13:34] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:13:34] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:13:38] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:13:38] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-17 13:19:55] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:19:55] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:19:56] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:19:56] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:21:16] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-17 13:21:17] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-17 13:21:17] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-17 13:21:18] info: [STT] Model loaded successfully.
+[2026-03-17 13:24:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:24:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-17 13:24:07] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:24:07] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:24:47] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:24:47] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-17 13:24:49] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:24:49] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-17 13:25:45] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:25:45] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-17 13:26:37] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:26:37] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-17 13:26:49] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:26:49] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-17 13:26:51] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:26:51] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:35:57] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:35:57] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:36:09] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:36:09] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-17 13:36:11] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-17 13:36:11] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-17 13:36:21] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-17 13:36:21] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-17 13:47:25] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-17 13:47:25] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-17 13:47:25] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:47:25] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-17 13:47:29] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-17 13:47:29] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-21 14:15:41] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-21 14:15:46] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-21 14:15:46] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-21 14:15:48] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-21 14:15:50] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-21 14:15:50] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-21 14:15:53] info: [STT] Model loaded successfully.
+[2026-03-21 15:14:05] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-21 15:14:05] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-21 15:14:05] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-21 15:14:05] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-21 15:14:10] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-21 15:14:12] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-21 15:14:12] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-21 15:14:15] info: [STT] Model loaded successfully.
+[2026-03-22 22:26:24] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-22 22:26:37] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-22 22:26:44] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-22 22:26:44] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-22 22:26:52] info: [STT] Model loaded successfully.
+[2026-03-22 22:27:44] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-22 22:27:45] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-22 22:27:51] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-22 22:27:53] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-22 22:27:53] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-22 22:28:03] info: [STT] Model loaded successfully.
+[2026-03-22 22:30:34] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-22 22:30:34] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-23 12:22:11] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-23 12:22:15] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-23 12:22:15] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-23 12:22:23] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-23 12:22:27] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-23 12:22:27] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-23 12:22:30] info: [STT] Model loaded successfully.
+[2026-03-23 12:22:41] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-03-23 12:22:41] info: Request succeeded: GET /sales? - Status: 304
+[2026-03-23 12:22:51] info: Incoming request: GET /sales?customer=sundry+debtors from 127.0.0.1
+[2026-03-23 12:22:51] info: Request succeeded: GET /sales?customer=sundry+debtors - Status: 200
+[2026-03-23 12:22:52] info: Incoming request: GET /sales?customer=sundry+debtors from 127.0.0.1
+[2026-03-23 12:22:52] info: Request succeeded: GET /sales?customer=sundry+debtors - Status: 304
+[2026-03-23 12:23:17] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-23 12:23:18] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-23 12:23:19] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-23 12:23:20] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-23 12:23:20] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-23 12:23:21] info: [STT] Model loaded successfully.
+[2026-03-23 22:34:17] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-23 22:34:22] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-23 22:34:22] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-23 22:34:25] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-23 22:34:26] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-23 22:34:26] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-23 22:34:31] info: [STT] Model loaded successfully.
+[2026-03-23 22:39:56] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-23 22:39:56] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-23 22:39:58] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-23 22:39:59] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-23 22:39:59] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-23 22:40:02] info: [STT] Model loaded successfully.
+[2026-03-23 22:49:31] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 22:49:31] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-23 22:49:32] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 22:49:32] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:14:33] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-23 23:14:33] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-23 23:14:33] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-23 23:14:35] info: [STT] Model loaded successfully.
+[2026-03-23 23:19:54] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:19:54] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:20:00] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:20:00] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:20:05] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:20:05] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:43:49] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:43:49] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:43:51] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:43:51] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:43:52] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:43:52] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:44:56] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:44:56] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:59:00] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:59:00] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-23 23:59:01] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-23 23:59:01] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-24 00:03:13] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-24 00:03:13] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-24 00:04:06] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-24 00:04:06] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-24 00:05:10] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-24 00:05:11] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-24 00:05:11] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-24 00:05:18] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-24 00:05:21] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-24 00:05:21] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-24 00:05:25] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-24 00:05:29] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-24 00:05:29] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-24 00:05:35] info: [STT] Model loaded successfully.
+[2026-03-25 12:12:41] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-25 12:12:44] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-25 12:12:44] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-25 12:12:46] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-25 12:12:47] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-25 12:12:47] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-25 12:12:49] info: [STT] Model loaded successfully.
+[2026-03-25 12:36:57] info: Incoming request: GET /sales?customer=sundry+debtors from 127.0.0.1
+[2026-03-25 12:36:57] info: Request succeeded: GET /sales?customer=sundry+debtors - Status: 304
+[2026-03-25 12:37:07] info: Incoming request: GET /sales?customer=sundry+debtors from 127.0.0.1
+[2026-03-25 12:37:07] info: Request succeeded: GET /sales?customer=sundry+debtors - Status: 304
+[2026-03-25 12:37:22] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-25 12:37:22] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-25 12:37:22] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 12:37:22] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-25 12:37:23] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-25 12:37:24] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-25 12:37:24] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-25 12:37:26] info: [STT] Model loaded successfully.
+[2026-03-25 12:57:05] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 12:57:05] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-25 12:58:59] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 12:58:59] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-25 12:59:01] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 12:59:01] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-25 12:59:02] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 12:59:02] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-25 13:02:00] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 13:02:00] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-03-25 13:06:20] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-03-25 13:06:21] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-03-25 13:06:21] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-03-25 13:06:23] info: [STT] Model loaded successfully.
+[2026-03-25 13:16:15] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-25 13:16:15] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-25 13:16:15] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-25 13:16:15] info: Request succeeded: GET /api/user/history - Status: 200
+[2026-03-25 13:17:53] info: Incoming request: GET /api/user/history from 127.0.0.1
+[2026-03-25 13:17:53] info: Request succeeded: GET /api/user/history - Status: 304
+[2026-03-25 13:18:26] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 13:18:26] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-25 14:38:14] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-03-25 14:38:14] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-03-25 14:38:14] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 14:38:14] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-03-25 14:38:22] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-03-25 14:38:22] info: Request succeeded: GET /api/admin/audit-logs - Status: 304
+[2026-04-15 23:50:12] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-04-15 23:50:15] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-04-15 23:50:15] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-04-15 23:50:17] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-04-15 23:50:18] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-04-15 23:50:18] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-04-15 23:50:21] info: [STT] Model loaded successfully.
+[2026-04-15 23:53:59] info: Incoming request: GET /sales? from 127.0.0.1
+[2026-04-15 23:53:59] info: Request succeeded: GET /sales? - Status: 304
+[2026-04-15 23:55:56] info: Incoming request: POST /api/auth/login from 127.0.0.1
+[2026-04-15 23:55:57] info: Request succeeded: POST /api/auth/login - Status: 200
+[2026-04-15 23:55:57] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-04-15 23:55:57] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-04-15 23:55:58] info: [STT] Loading Whisper model (Xenova/whisper-tiny.en)...
+[2026-04-15 23:55:59] info: [VoiceTally-Backend] Securely running at http://127.0.0.1:3000
+[2026-04-15 23:55:59] info: [Security] Rate Limit: 100 reqs / 1 min
+[2026-04-15 23:56:01] info: [STT] Model loaded successfully.
+[2026-04-15 23:56:34] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-04-15 23:56:34] info: Request succeeded: GET /api/admin/audit-logs - Status: 200
+[2026-04-15 23:56:34] info: Incoming request: GET /api/admin/audit-logs from 127.0.0.1
+[2026-04-15 23:56:34] info: Request succeeded: GET /api/admin/audit-logs - Status: 304

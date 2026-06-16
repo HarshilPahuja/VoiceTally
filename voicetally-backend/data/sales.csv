@@ -1,0 +1,11 @@
+date,customer,amount,status
+2026-03-06,Customer A,1180.0,Paid
+2026-02-21,Customer B,500.0,Processing
+2026-01-27,Customer C,600.0,Unpaid
+2025-11-28,Customer D,658.0,Processing
+2026-03-06,Customer E,740.0,Paid
+2026-02-28,Customer F,1120.0,Unpaid
+2025-08-20,Customer G,1550.0,Paid
+2026-03-03,Customer H,909.0,Unpaid
+2026-02-11,Customer I,980.0,Paid
+2025-02-01,Customer J,100.0,Paid

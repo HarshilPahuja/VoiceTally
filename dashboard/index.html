@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>VoiceTally | Dashboard</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --bg: #F9FAFB;
+            --surface: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        :root.dark-mode {
+            --primary: #818CF8;
+            --bg: #111827;
+            --surface: #1F2937;
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --border: #374151;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .topbar {
+            background: var(--surface);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            margin-left: 24px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            transition: background 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: var(--border);
+        }
+
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            color: var(--text-main);
+        }
+
+        .btn-theme:hover {
+            background: var(--border);
+        }
+
+        .content-area {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-card {
+            background: var(--surface);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .welcome-card h1 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+        }
+
+        .welcome-card p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        #adminLink {
+            display: none;
+            /* Hidden by default; JS enables it if admin */
+            color: #7C3AED;
+            font-weight: 700;
+        }
+
+        /* Data Explorer Styles */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: var(--primary);
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .btn-primary {
+            padding: 10px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #4338CA;
+        }
+
+        .status-msg {
+            font-size: 13px;
+            margin-top: 12px;
+            min-height: 18px;
+        }
+
+        .status-error {
+            color: #EF4444;
+        }
+
+        .summary-bar {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #F3F4F6;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: #F9FAFB;
+            text-align: left;
+            padding: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 500;
+            background: #E5E7EB;
+        }
+
+        .badge-paid {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-processing {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-unpaid {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* Analytics Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+        }
+
+        .chart-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .chart-skeleton {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Ensure user is logged in -->
+
+
+    <div class="topbar">
+        <div class="brand">
+            📊 VoiceTally
+        </div>
+        <div class="nav-links">
+            <a href="#">Overview</a>
+            <a href="#">Recent Queries</a>
+            <a href="#">Reports</a>
+            <a href="admin.html" id="adminLink">Admin Panel</a>
+        </div>
+        <div class="user-menu">
+            <button id="themeToggleBtn" class="btn-theme" title="Toggle Day/Night Mode">🌙</button>
+            <span id="userEmail">Loading...</span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="content-area">
+        <div class="welcome-card">
+            <h1 id="greeting">Welcome to VoiceTally!</h1>
+            <p>Use the Chrome Extension to start querying your data. Your history and generated reports will appear
+                here.</p>
+        </div>
+
+        <h3 style="margin-top: 32px;">Real-Time Financial Insights</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">These graphs refresh automatically when new data enters Tally.</p>
+        
+        <div class="dashboard-grid" id="chartsContainer">
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+            <div class="chart-card"><div class="chart-skeleton"></div></div>
+        </div>
+
+        <div id="historyContainer" style="margin-top: 32px;">
+            <h3 style="margin-bottom: 16px;">Recent Query History</h3>
+            <div id="historyList"
+                style="background: var(--surface); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                Loading history...
+            </div>
+        </div>
+
+        <!-- Data Explorer (Tally Search) -->
+        <div style="margin-top: 32px;">
+            <h3 style="margin-bottom: 16px;">Data Explorer</h3>
+            <div class="panel">
+                <div class="panel-header">Search Tally Data</div>
+                <div class="form-group">
+                    <label>Search Query</label>
+                    <input type="text" id="tallySearchQuery" placeholder="e.g., 'sundry debtors', 'sales invoice last month'">
+                </div>
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Collection (Optional)</label>
+                        <select id="tallyCollection">
+                            <option value="">All Collections</option>
+                            <option value="sales">Sales</option>
+                            <option value="day_book">Day Book</option>
+                            <option value="ledgers">Ledgers</option>
+                            <option value="groups">Groups</option>
+                            <option value="stock_items">Stock Items</option>
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label>Customer (Optional)</label>
+                        <input type="text" id="tallyCustomer" placeholder="Filter by customer...">
+                    </div>
+                </div>
+                <button class="btn-primary" id="tallySearchBtn">Search Tally</button>
+                <div id="explorerStatus" class="status-msg"></div>
+            </div>
+
+            <div id="explorerResults" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                    <div class="summary-bar" id="summaryBar" style="flex: 1; margin-bottom: 0;"></div>
+                    <button class="btn-primary" id="generatePdfBtn" style="margin-left: 16px; white-space: nowrap; background-color: #10B981;">📄 Generate PDF Report</button>
+                </div>
+                <div class="panel" style="padding: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Collection</th>
+                                <th>Summary</th>
+                                <th>Relevance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+
+</body>
+
+</html>

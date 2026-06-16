@@ -1,0 +1,294 @@
+// Dashboard — VoiceTally (standalone, no auth required)
+console.log('[Dashboard] Initializing Dashboard.');
+
+function logout() {
+    console.log('[Dashboard] Clearing session.');
+    sessionStorage.clear();
+    location.reload();
+}
+window.logout = logout;
+
+// ============================================================
+// DATA EXPLORER (Tally Vector Search)
+// ============================================================
+const tallySearchBtn = document.getElementById('tallySearchBtn');
+const generatePdfBtn = document.getElementById('generatePdfBtn');
+const explorerStatus = document.getElementById('explorerStatus');
+const explorerResults = document.getElementById('explorerResults');
+const dataTableBody = document.getElementById('dataTableBody');
+const summaryBar = document.getElementById('summaryBar');
+
+let lastTallyData = null;
+
+function getTallyUrl() {
+    return new Promise(resolve => {
+        if (typeof chrome !== 'undefined' && chrome.storage) {
+            chrome.storage.local.get(['tallyApiUrl'], (res) => {
+                resolve(res.tallyApiUrl || 'http://localhost:8000');
+            });
+        } else {
+            resolve('http://localhost:8000');
+        }
+    });
+}
+
+function getIntelligenceApiUrl() {
+    return new Promise(resolve => {
+        if (typeof chrome !== 'undefined' && chrome.storage) {
+            chrome.storage.local.get(['intelligenceApiUrl'], (res) => {
+                resolve(res.intelligenceApiUrl || 'http://127.0.0.1:8001');
+            });
+        } else {
+            resolve('http://127.0.0.1:8001');
+        }
+    });
+}
+
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+let currentTheme = localStorage.getItem('vt_theme') || 'light';
+
+function applyTheme(theme) {
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+        if (themeToggleBtn) themeToggleBtn.textContent = '☀️';
+    } else {
+        document.documentElement.classList.remove('dark-mode');
+        if (themeToggleBtn) themeToggleBtn.textContent = '🌙';
+    }
+    currentTheme = theme;
+    localStorage.setItem('vt_theme', theme);
+    // Refresh charts when theme changes
+    if (typeof fetchDashboardVisuals === 'function') {
+        fetchDashboardVisuals();
+    }
+}
+
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+    });
+}
+
+// Initial theme setup (but do not fetch charts immediately here, it's called at the end of the file)
+if (currentTheme === 'dark') {
+    document.documentElement.classList.add('dark-mode');
+    if (themeToggleBtn) themeToggleBtn.textContent = '☀️';
+}
+
+// ============================================================
+// DASHBOARD VISUALS (Pandas + Matplotlib Base64 Graphs)
+// ============================================================
+async function fetchDashboardVisuals() {
+    const chartsContainer = document.getElementById('chartsContainer');
+    if (!chartsContainer) return;
+
+    const intellUrl = await getIntelligenceApiUrl();
+    const theme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
+    console.info(`[Dashboard] Fetching graphical insights from ${intellUrl}/dashboard/visuals?theme=${theme}`);
+
+    try {
+        const res = await fetch(`${intellUrl}/dashboard/visuals?theme=${theme}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const data = await res.json();
+        
+        if (data.status === 'success' && data.charts) {
+            // Map the 8 chart keys to the grid
+            const chartMapping = [
+                data.charts.cash_bank,
+                data.charts.profit_loss,
+                data.charts.purchase_sales,
+                data.charts.stock_value,
+                data.charts.capital_assets,
+                data.charts.top_5_reports,
+                data.charts.slow_items,
+                data.charts.overdue_bills
+            ];
+
+            chartsContainer.innerHTML = ''; // Clear skeletons
+            chartMapping.forEach(base64Str => {
+                const card = document.createElement('div');
+                card.className = 'chart-card';
+                if (base64Str) {
+                    const img = document.createElement('img');
+                    img.src = base64Str;
+                    card.appendChild(img);
+                } else {
+                    card.innerHTML = '<span style="color:var(--text-muted)">Data Unavailable</span>';
+                }
+                chartsContainer.appendChild(card);
+            });
+        }
+    } catch (err) {
+        console.error(`[Dashboard] Failed to fetch visuals:`, err);
+        chartsContainer.innerHTML = `<div style="grid-column: 1 / -1; color: var(--danger); text-align: center;">Failed to load financial insights from Intelligence API. Verify it is running at ${intellUrl}</div>`;
+    }
+}
+
+tallySearchBtn.addEventListener('click', async () => {
+    const query = document.getElementById('tallySearchQuery').value.trim();
+    if (!query) {
+        explorerStatus.textContent = 'Please enter a search query.';
+        explorerStatus.className = 'status-msg status-error';
+        return;
+    }
+
+    explorerStatus.textContent = 'Searching Tally...';
+    explorerStatus.className = 'status-msg';
+    explorerResults.style.display = 'none';
+    dataTableBody.innerHTML = '';
+
+    const collection = document.getElementById('tallyCollection').value;
+    const customer = document.getElementById('tallyCustomer').value.trim();
+
+    const body = { query, top_k: 20 };
+    if (collection) body.collection = collection;
+    if (customer) body.customer = customer;
+
+    const tallyUrl = await getTallyUrl();
+    console.info(`[Dashboard Explorer] POST ${tallyUrl}/search`, body);
+
+    try {
+        const response = await fetch(`${tallyUrl}/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) throw new Error(`Tally API returned ${response.status}`);
+
+        const data = await response.json();
+        console.log(`[Dashboard Explorer] Results:`, data);
+        lastTallyData = data;
+
+        explorerStatus.textContent = '';
+        explorerResults.style.display = 'block';
+
+        summaryBar.innerHTML = `
+            <div><strong>Query:</strong> ${data.query || ''}</div>
+            <div><strong>Results:</strong> ${data.result_count || 0}</div>
+        `;
+
+        if (data.results && data.results.length > 0) {
+            data.results.forEach(r => {
+                const tr = document.createElement('tr');
+                const pct = Math.round((r.relevance || 0) * 100);
+                const badge = pct >= 70 ? 'badge-paid' : pct >= 40 ? 'badge-processing' : 'badge-unpaid';
+                tr.innerHTML = `
+                    <td><span class="badge badge-pending">${r.collection || ''}</span></td>
+                    <td title="${(r.summary || '').replace(/"/g, '&quot;')}">${r.summary || ''}</td>
+                    <td><span class="badge ${badge}">${pct}%</span></td>
+                `;
+                dataTableBody.appendChild(tr);
+            });
+        } else {
+            dataTableBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No matching records found.</td></tr>`;
+        }
+    } catch (err) {
+        explorerStatus.textContent = `Error: ${err.message}. Is the Tally API running?`;
+        explorerStatus.className = 'status-msg status-error';
+        console.error(`[Dashboard Explorer] Error:`, err);
+    }
+});
+
+generatePdfBtn.addEventListener('click', async () => {
+    if (!lastTallyData || !lastTallyData.results || lastTallyData.results.length === 0) {
+        alert("Please perform a successful search first to generate a report.");
+        return;
+    }
+
+    const intellUrl = await getIntelligenceApiUrl();
+    const points = lastTallyData.results.map(r => r.summary).filter(Boolean).slice(0, 15);
+
+    const body = {
+        title: "VoiceTally Data Explorer Report",
+        summary: `Search Query: "${lastTallyData.query || 'N/A'}"\nTotal Results Found: ${lastTallyData.result_count || 0}`,
+        data: {
+            points: points
+        }
+    };
+
+    generatePdfBtn.textContent = "⏳ Generating...";
+    generatePdfBtn.disabled = true;
+
+    try {
+        console.info(`[Dashboard] Requesting PDF generation...`);
+        const response = await fetch(`${intellUrl}/reports/generate-pdf`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) throw new Error(`Report generation failed (${response.status})`);
+
+        const data = await response.json();
+        if (data.pdf_path) {
+            // pdf_path is something like 'reports/voicetally_data_explorer_report_2026-03-14.pdf'
+            // We use the static mount configured in app/main.py
+            let cleanPath = data.pdf_path.replace(/\\/g, '/');
+            if (cleanPath.startsWith('reports/')) {
+                cleanPath = cleanPath.replace('reports/', 'downloads/');
+            }
+            const pdfUrl = `${intellUrl}/${cleanPath}`;
+            console.log(`[Dashboard] Opening PDF at: ${pdfUrl}`);
+            window.open(pdfUrl, '_blank');
+        }
+    } catch (err) {
+        console.error("[Dashboard] Error generating PDF:", err);
+        alert("Failed to generate PDF. Make sure the Intelligence API is running at " + intellUrl);
+    } finally {
+        generatePdfBtn.textContent = "📄 Generate PDF Report";
+        generatePdfBtn.disabled = false;
+    }
+});
+``
+// ============================================================
+// LIVE UPDATES VIA WEBSOCKET
+// ============================================================
+async function connectWebSocket() {
+    const tallyUrl = await getTallyUrl();
+    // Convert http(s):// to ws(s)://
+    const wsUrl = tallyUrl.replace(/^http/, 'ws') + '/ws';
+    
+    console.info(`[Dashboard] Connecting to WebSocket at ${wsUrl}`);
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+        console.log(`[Dashboard] WebSocket connected for live Tally updates.`);
+    };
+
+    ws.onmessage = (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (data.type === "data_updated") {
+                console.info(`🔄 [Dashboard] Tally data changed! Automatically refreshing results...`);
+                // Auto-refresh the charts
+                fetchDashboardVisuals();
+                // Only refresh table if there's already a query in the box
+                if (document.getElementById('tallySearchQuery').value.trim()) {
+                    tallySearchBtn.click();
+                }
+            }
+        } catch (err) {
+            console.error('[Dashboard] Error parsing WS message:', err);
+        }
+    };
+
+    ws.onclose = () => {
+        console.warn(`[Dashboard] WebSocket disconnected. Retrying in 5 seconds...`);
+        setTimeout(connectWebSocket, 5000);
+    };
+
+    ws.onerror = (err) => {
+        console.error(`[Dashboard] WebSocket error. Is Tally API running?`);
+        ws.close();
+    };
+}
+
+// Start WebSocket connection
+connectWebSocket();
+// Fetch Initial Graph Visualizations
+fetchDashboardVisuals();

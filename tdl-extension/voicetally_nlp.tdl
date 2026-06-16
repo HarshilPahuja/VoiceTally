@@ -1,0 +1,71 @@
+;; =====================================================================
+;; VoiceTally TDL Extension — NLP Query Launcher
+;;
+;; Adds a menu item to Gateway of Tally that launches the
+;; Python NLP query tool automatically.
+;;
+;; Load: Gateway of Tally > F1 (Help) > TDL & Add-on > F4 > Add file
+;; =====================================================================
+
+
+;; ─── Add "VoiceTally Query" to the Gateway of Tally menu ───────────
+
+[#Menu: Gateway of Tally]
+    Add : Key Item : VoiceTally NLP Query : V : Display : VTLaunchReport
+
+
+;; ─── Report that auto-launches the Python GUI on open ───────────────
+
+[Report: VTLaunchReport]
+    Form : VTLaunchForm
+
+[Form: VTLaunchForm]
+    Parts  : VTLaunchPart
+    Height : 25% Screen
+    Width  : 45% Screen
+
+[Part: VTLaunchPart]
+    Lines : VTLine1, VTBlank1, VTLine2, VTLine3
+
+[Line: VTLine1]
+    Fields : VTF1
+
+[Field: VTF1]
+    Set as : "VoiceTally NLP Query Tool"
+    Style  : Bold
+    Align  : Centre
+    Width  : 100% Page
+
+[Line: VTBlank1]
+    Fields : VTBlankF1
+
+[Field: VTBlankF1]
+    Set as : ""
+    Width  : 100% Page
+
+[Line: VTLine2]
+    Fields : VTF2
+
+[Field: VTF2]
+    Set as : "Press Ctrl+Shift+V to open VoiceTally"
+    Align  : Centre
+    Width  : 100% Page
+
+[Line: VTLine3]
+    Fields : VTF3
+
+[Field: VTF3]
+    Set as : "Press Esc to close"
+    Align  : Centre
+    Width  : 100% Page
+
+
+;; ─── Function to launch the batch file (Unsupported in EDU) ───
+
+;; [Function: VTTryLaunch]
+;;     01 : Exec Command : "cmd /c start """" "".\launch_voicetally.bat"""
+
+;; =====================================================================
+;; END
+;; =====================================================================
+
