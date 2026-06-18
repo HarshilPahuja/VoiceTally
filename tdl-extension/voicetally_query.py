@@ -284,16 +284,55 @@ class VoiceTallyApp:
         tray_thread.start()
 
     def setup_hotkey(self):
-        if keyboard is None:
-            return
+        if sys.platform == "win32":
+            def listen_hotkey(callback):
+                import ctypes
+                from ctypes import wintypes
+                user32 = ctypes.windll.user32
+                # Try registering Windows native global hotkey (Ctrl+Shift+V)
+                # MOD_CONTROL (0x0002) | MOD_SHIFT (0x0004) | MOD_NOREPEAT (0x4000)
+                registered = user32.RegisterHotKey(None, 99, 0x0002 | 0x0004 | 0x4000, 0x56)
+                if not registered:
+                    # Fallback retry without MOD_NOREPEAT
+                    registered = user32.RegisterHotKey(None, 99, 0x0002 | 0x0004, 0x56)
+                
+                if not registered:
+                    print("Failed to register Windows native global hotkey. Trying keyboard hook fallback...")
+                    if keyboard:
+                        try:
+                            keyboard.add_hotkey(HOTKEY, callback, suppress=True)
+                            print("Keyboard hook fallback successful.")
+                            # We keep the thread alive or just exit, keyboard library uses its own hook thread.
+                        except Exception as e:
+                            print(f"Keyboard hook fallback failed: {e}")
+                    return
 
-        keyboard.add_hotkey(HOTKEY, lambda: self.root.after(0, self.toggle_window), suppress=True)
+                try:
+                    msg = wintypes.MSG()
+                    while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) != 0:
+                        if msg.message == 0x0312:  # WM_HOTKEY
+                            if msg.wParam == 99:
+                                callback()
+                        user32.TranslateMessage(ctypes.byref(msg))
+                        user32.DispatchMessageW(ctypes.byref(msg))
+                finally:
+                    user32.UnregisterHotKey(None, 99)
+
+            threading.Thread(target=listen_hotkey, args=(lambda: self.root.after(0, self.toggle_window),), daemon=True).start()
+        else:
+            if keyboard:
+                keyboard.add_hotkey(HOTKEY, lambda: self.root.after(0, self.toggle_window), suppress=True)
 
     def _quit_app(self):
         if self.tray_icon:
             self.tray_icon.stop()
+        if sys.platform == "win32":
+            pass
         if keyboard:
-            keyboard.unhook_all()
+            try:
+                keyboard.unhook_all()
+            except Exception:
+                pass
         self.root.after(0, self.root.destroy)
 
     # ── Placeholder behavior ─────────────────────────────────────
@@ -503,6 +542,25 @@ class VoiceTallyApp:
             print(f"Could not add to Windows Startup: {e}")
 
     def run(self):
+        # Start socket listener for single-instance show requests
+        def socket_listener(app_instance):
+            import socket
+            server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                server.bind(('127.0.0.1', 58485))
+                server.listen(1)
+                while True:
+                    conn, addr = server.accept()
+                    data = conn.recv(1024).decode('utf-8')
+                    if "SHOW" in data:
+                        app_instance.root.after(0, app_instance.show_window)
+                    conn.close()
+            except Exception:
+                pass
+        
+        threading.Thread(target=socket_listener, args=(self,), daemon=True).start()
+
         # Ensure it boots automatically on next restart
         self._add_to_startup()
 
@@ -523,6 +581,54 @@ class VoiceTallyApp:
 
 # ── Entry Point ──────────────────────────────────────────────────────
 
+def check_single_instance():
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(('127.0.0.1', 58485))
+        # Always send SHOW to the running instance to bring it to foreground
+        s.sendall(b"SHOW")
+        s.close()
+        print("Another instance is already running. Exiting.")
+        sys.exit(0)
+    except socket.error:
+        pass
+
+
+def check_and_start_backend():
+    import urllib.request
+    import subprocess
+    # Check if backend (NLP API) is running on port 8001
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:8001/", timeout=1.0) as r:
+            if r.status == 200:
+                print("Backend API is already running.")
+                return
+    except Exception:
+        pass
+
+    # Backend is not running, let's launch launch_voicetally.bat silently
+    app_dir = os.path.dirname(os.path.abspath(sys.executable if getattr(sys, 'frozen', False) else __file__))
+    bat_paths = [
+        os.path.join(app_dir, "tdl-extension", "launch_voicetally.bat"),
+        os.path.join(app_dir, "launch_voicetally.bat"),
+        os.path.join(os.path.dirname(app_dir), "tdl-extension", "launch_voicetally.bat"),
+    ]
+    for path in bat_paths:
+        if os.path.exists(path):
+            print(f"Starting backend servers via: {path}")
+            if sys.platform == "win32":
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                startupinfo.wShowWindow = subprocess.SW_HIDE
+                subprocess.Popen([path], startupinfo=startupinfo, creationflags=subprocess.CREATE_NEW_CONSOLE)
+            else:
+                subprocess.Popen([path])
+            break
+
+
 if __name__ == "__main__":
+    check_single_instance()
+    check_and_start_backend()
     app = VoiceTallyApp()
     app.run()
