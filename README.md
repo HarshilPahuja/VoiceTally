@@ -4,7 +4,7 @@ VoiceTally is a modern, voice-driven AI assistant and graphical dashboard ecosys
 
 ---
 
-## 🚀 Easy Installation for Users (Recommended)
+## Easy Installation for Users (Recommended)
 
 To install and run VoiceTally on your Windows PC, you do **not** need to touch any code or configure files manually. Simply download and run the single-click installer:
 
@@ -18,7 +18,7 @@ To install and run VoiceTally on your Windows PC, you do **not** need to touch a
 
 ---
 
-## 🏗️ Technical Architecture Overview
+## Technical Architecture Overview
 
 VoiceTally is composed of modular service layers that communicate locally for absolute privacy, low latency, and offline-first capabilities:
 
@@ -53,3 +53,7 @@ To allow the VoiceTally app to communicate with Tally:
 4. Open your TDL Settings (**Help** > **TDLs & Add-ons** > **F4**) and add the path to the TDL launcher script:
    `C:\Users\<YourUsername>\AppData\Local\VoiceTally\tdl-extension\voicetally_nlp.tdl`
    *(Or press Windows key + R, type `%localappdata%\VoiceTally\tdl-extension\voicetally_nlp.tdl` to find the exact location)*
+
+
+
+  ***FEW BUGS LEFT TO FIX, WILL RELEASE ONCE FIXED***
