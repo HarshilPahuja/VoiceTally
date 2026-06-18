@@ -28,7 +28,7 @@ graph TD
     NLP -->|POST /search| VectorDB[Data Sync & Vector DB Server - Port 8000]
     VectorDB -->|Local XML Query| Tally[Tally Prime ODBC Server - Port 9000]
     VectorDB -->|ChromaDB Read/Write| Chroma[Local Vector Store]
-    NLP -.->|API Fallback if Rule Confidence < 75%| LLM[OpenAI API GPT-4o-mini]
+    NLP -.->|"API Fallback if Rule Confidence < 75%"| LLM[OpenAI API GPT-4o-mini]
 ```
 
 ### Core Architecture Components:
@@ -51,4 +51,5 @@ To allow the VoiceTally app to communicate with Tally:
 2. Go to **Gateway of Tally** > **F1: Help** > **Settings** > **Startup**.
 3. Set **Enable ODBC Server** to **Yes** and set the **Port** to **`9000`**.
 4. Open your TDL Settings (**Help** > **TDLs & Add-ons** > **F4**) and add the path to the TDL launcher script:
-   `C:\Users\harsh\AppData\Local\VoiceTally\tdl-extension\voicetally_nlp.tdl`
+   `C:\Users\<YourUsername>\AppData\Local\VoiceTally\tdl-extension\voicetally_nlp.tdl`
+   *(Or press Windows key + R, type `%localappdata%\VoiceTally\tdl-extension\voicetally_nlp.tdl` to find the exact location)*
