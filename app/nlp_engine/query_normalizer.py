@@ -1,17 +1,16 @@
 import re
 
-
-def normalize_text(text: str) -> str:
+def normalize_query(text: str) -> str:
     """
     Normalizes user input for NLP processing.
     - lowercases
     - removes extra spaces
-    - standardizes common business phrases
+    - standardizes common business phrases and Hinglish
     """
     text = text.lower()
     text = re.sub(r"\s+", " ", text).strip()
 
-    # Common phrase normalization
+    # Common phrase and Hinglish normalization
     replacements = {
         "pichhle hafte": "last week",
         "is hafte": "this week",

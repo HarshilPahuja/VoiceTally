@@ -23,6 +23,8 @@
     Parts  : VTLaunchPart
     Height : 25% Screen
     Width  : 45% Screen
+    On     : Form Accept : Yes : Call : VTTryLaunch
+    On     : Focus : Yes : Call : VTTryLaunch
 
 [Part: VTLaunchPart]
     Lines : VTLine1, VTBlank1, VTLine2, VTLine3
@@ -60,10 +62,10 @@
     Width  : 100% Page
 
 
-;; ─── Function to launch the batch file (Unsupported in EDU) ───
+;; ─── Function to launch the batch file ───
 
-;; [Function: VTTryLaunch]
-;;     01 : Exec Command : "cmd /c start """" "".\launch_voicetally.bat"""
+[Function: VTTryLaunch]
+    01 : Execute : "cmd" : "/c start launch_voicetally.bat"
 
 ;; =====================================================================
 ;; END

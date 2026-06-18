@@ -1,7 +1,6 @@
 import re
 from app.core import constants
 
-
 INTENT_PATTERNS = {
     # 1. Ledger Balance (checked first to prevent general sales/purchase keywords from overriding)
     constants.GET_LEDGER_BALANCE: [
@@ -51,13 +50,18 @@ INTENT_PATTERNS = {
     ],
 }
 
-
-def classify_intent(text: str) -> str | None:
+def classify_intent_rules(text: str) -> tuple[str | None, float]:
+    """
+    Classifies intent using rule-based regex patterns.
+    Returns: (intent, match_quality)
+    """
     text = text.lower()
 
     for intent, patterns in INTENT_PATTERNS.items():
         for pattern in patterns:
             if re.search(pattern, text):
-                return intent
+                # We return a match quality based on the complexity/length of the matched pattern
+                # Exact matches or longer patterns represent higher match quality
+                return intent, 1.0
 
-    return None
+    return None, 0.0

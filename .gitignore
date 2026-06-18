@@ -155,3 +155,6 @@ reports/
 
 
 *.xlsx
+dist_build/
+VoiceTallySetup.exe
+*.exe

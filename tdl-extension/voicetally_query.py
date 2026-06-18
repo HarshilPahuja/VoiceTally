@@ -205,6 +205,8 @@ class VoiceTallyApp:
         self.result_text.tag_configure("error", foreground=ERROR, font=("Consolas", 11))
         self.result_text.tag_configure("info", foreground=INFO, font=("Consolas", 10))
         self.result_text.tag_configure("muted", foreground=TEXT_MUTED, font=("Consolas", 10))
+        self.result_text.tag_configure("meta_chip", background=BG_SECONDARY, foreground=SUCCESS, font=("Consolas", 9, "bold"))
+        self.result_text.tag_configure("meta_source", background=BG_SECONDARY, foreground=INFO, font=("Consolas", 9, "bold"))
 
         hotkey_hint = f"\n\nHotkey: {HOTKEY.upper()}" if keyboard else ""
         self._set_result(
@@ -223,11 +225,27 @@ class VoiceTallyApp:
             font=("Segoe UI", 8), bg=BG, fg=TEXT_MUTED
         ).pack(side="left")
 
+        self.copy_btn = tk.Button(
+            footer, text="📋 Copy", font=("Segoe UI", 8, "bold"),
+            bg=BG_SECONDARY, fg=TEXT_MUTED, relief="flat", bd=0,
+            cursor="hand2", command=self._on_copy_click, padx=6
+        )
+        self.copy_btn.pack(side="right")
+
     # ── Window Show/Hide ─────────────────────────────────────────
 
     def show_window(self):
         self.root.deiconify()
         self.root.lift()
+        self.root.focus_force()
+        self.query_entry.focus_set()
+
+    def _on_copy_click(self):
+        text = self.result_text.get("1.0", "end-1c").strip()
+        if text and not text.startswith("Type a query"):
+            self.root.clipboard_clear()
+            self.root.clipboard_append(text)
+            self._set_status("✓ Copied to clipboard", SUCCESS)
         self.root.focus_force()
         self.query_entry.focus_set()
 
@@ -269,7 +287,7 @@ class VoiceTallyApp:
         if keyboard is None:
             return
 
-        keyboard.add_hotkey(HOTKEY, lambda: self.root.after(0, self.toggle_window))
+        keyboard.add_hotkey(HOTKEY, lambda: self.root.after(0, self.toggle_window), suppress=True)
 
     def _quit_app(self):
         if self.tray_icon:
@@ -341,8 +359,16 @@ class VoiceTallyApp:
 
         self.is_recording = True
         self.mic_btn.config(bg=ERROR, fg="white", text="⏺")
+        self._animate_recording(0)
         self._set_status(f"Recording {RECORD_SECONDS}s... speak now!", ERROR)
         threading.Thread(target=self._do_voice_capture, daemon=True).start()
+
+    def _animate_recording(self, step=0):
+        if not self.is_recording:
+            return
+        symbols = ["⏺  ●", "⏺  ● ●", "⏺  ● ● ●", "⏺  ● ●", "⏺  ●"]
+        self.mic_btn.config(bg=ERROR, fg="white", text=symbols[step % len(symbols)])
+        self.root.after(300, lambda: self._animate_recording(step + 1))
 
     def _do_voice_capture(self):
         try:
@@ -389,8 +415,6 @@ class VoiceTallyApp:
             self.is_recording = False
             self.root.after(0, lambda: self.mic_btn.config(bg=BG_SECONDARY, fg=TEXT_MUTED, text="🎤"))
 
-    # ── Display Helpers ──────────────────────────────────────────
-
     def _show_result(self, data):
         self.result_text.config(state="normal")
         self.result_text.delete("1.0", "end")
@@ -398,6 +422,8 @@ class VoiceTallyApp:
         error = data.get("error")
         answer = data.get("answer")
         intent = data.get("intent") or "UNKNOWN"
+        confidence = data.get("confidence", 0.0)
+        source = data.get("source", "rules")
 
         if error:
             self.result_text.insert("end", f"⚠ {error}\n", "error")
@@ -406,6 +432,24 @@ class VoiceTallyApp:
             return
 
         self._set_status(f"✓ {intent}", SUCCESS)
+
+        # Draw structured chips
+        self.result_text.insert("end", "INTENT: ", "label")
+        self.result_text.insert("end", f" {intent} ", "meta_source")
+        self.result_text.insert("end", f"  CONFIDENCE: {int(confidence*100)}% ({source.upper()})\n\n", "meta_chip")
+
+        # Draw entities
+        entities = data.get("entities", {})
+        if entities:
+            self.result_text.insert("end", "EXTRACTED FILTERS:\n", "label")
+            for k, v in entities.items():
+                if isinstance(v, dict):
+                    val_str = ", ".join([f"{sub_k}: {sub_v}" for sub_k, sub_v in v.items()])
+                else:
+                    val_str = str(v)
+                self.result_text.insert("end", f"  • {k.replace('_', ' ').title()}: ", "label")
+                self.result_text.insert("end", f"{val_str}\n", "value")
+            self.result_text.insert("end", "\n")
 
         self.result_text.insert("end", "ANSWER\n", "label")
         if answer:

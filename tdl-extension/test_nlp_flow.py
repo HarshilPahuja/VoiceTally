@@ -19,9 +19,13 @@ import os
 # Allow importing from the project root
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.nlp_engine.normalizer import normalize_text
-from app.nlp_engine.intent_classifier.classifier import get_intent
-from app.nlp_engine.entity_extraction.extractor import extract_entities
+from app.nlp_engine.query_normalizer import normalize_query as normalize_text
+from app.nlp_engine.intent_classifier import classify_intent_rules
+
+def get_intent(text: str) -> str | None:
+    return classify_intent_rules(text)[0]
+
+from app.nlp_engine.entity_extractor import extract_entities_rules as extract_entities
 from app.core import constants
 
 PASS = 0
