@@ -31,7 +31,7 @@ INTENT_PATTERNS = {
     ],
     # 5. Stock/Inventory Inquiry
     constants.GET_STOCK_SUMMARY: [
-        r"\bstocks? inquiries?\b",
+        r"\bstocks? inquir(y|ies)\b",
         r"\binventor(y|ies)\b",
         r"\bstocks? levels?\b",
         r"\bhow many.*left\b",

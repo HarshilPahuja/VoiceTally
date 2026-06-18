@@ -15,6 +15,9 @@ class NLPResponse(BaseModel):
     language: Optional[str] = None
     error: Optional[str] = None
     answer: Optional[str] = None
+    confidence: Optional[float] = None
+    source: Optional[str] = None
+
 
 
 # ---------- Insights ----------

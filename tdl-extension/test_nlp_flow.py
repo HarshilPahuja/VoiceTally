@@ -80,6 +80,10 @@ for query in [
     "today summary",
     "yesterday transactions",
     "this week purchases",
+    "sales in last 10 days",
+    "invoices in past 3 weeks",
+    "purchases in last 2 months",
+    "transactions from last 5 years",
 ]:
     normalized = normalize_text(query)
     entities = extract_entities(normalized)

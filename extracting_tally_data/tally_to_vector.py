@@ -65,10 +65,10 @@ def post_xml(body: str) -> ET.Element | None:
             timeout=60,
         )
     except requests.exceptions.ConnectionError:
-        print(f"❌  Cannot connect to Tally at {TALLY_URL}")
+        print(f"Error: Cannot connect to Tally at {TALLY_URL}")
         return None
     except Exception as e:
-        print(f"⚠️  Request error: {e}")
+        print(f"Warning: Request error: {e}")
         return None
 
     raw     = resp.content.decode("utf-8", errors="replace")
@@ -78,7 +78,7 @@ def post_xml(body: str) -> ET.Element | None:
     try:
         return ET.fromstring(cleaned)
     except ET.ParseError as e:
-        print(f"⚠️  XML parse error: {e}")
+        print(f"Warning: XML parse error: {e}")
         print("    Preview:", cleaned[:400])
         return None
 
@@ -140,7 +140,7 @@ def fetch_all_masters() -> ET.Element | None:
 # ---------------- GROUPS ---------------- #
 
 def extract_groups(masters_root: ET.Element | None = None):
-    print("\n🔄  Extracting Groups …")
+    print("\nExtracting Groups...")
 
     root   = masters_root if masters_root is not None else fetch_all_masters()
     groups = root.findall(".//GROUP") if root is not None else []
@@ -150,7 +150,7 @@ def extract_groups(masters_root: ET.Element | None = None):
         groups = root.findall("GROUP") if root is not None else []
 
     if not groups:
-        print("⚠️  No GROUP tags found in Tally response.")
+        print("Warning: No GROUP tags found in Tally response.")
         return
 
     docs, meta, ids = [], [], []
@@ -165,21 +165,21 @@ def extract_groups(masters_root: ET.Element | None = None):
 
     if docs:
         collections["groups"].upsert(documents=docs, metadatas=meta, ids=ids)
-        print(f"✅  Upserted {len(docs)} groups")
+        print(f"Upserted {len(docs)} groups")
     else:
-        print("⚠️  GROUP elements found but all had empty NAME.")
+        print("Warning: GROUP elements found but all had empty NAME.")
 
 
 # ---------------- LEDGERS ---------------- #
 
 def extract_ledgers(masters_root: ET.Element | None = None):
-    print("\n🔄  Extracting Ledgers …")
+    print("\nExtracting Ledgers...")
 
     root    = masters_root if masters_root is not None else fetch_all_masters()
     ledgers = root.findall(".//LEDGER") if root is not None else []
 
     if not ledgers:
-        print("⚠️  No ledgers found.")
+        print("Warning: No ledgers found.")
         return
 
     docs, meta, ids = [], [], []
@@ -194,13 +194,13 @@ def extract_ledgers(masters_root: ET.Element | None = None):
 
     if docs:
         collections["ledgers"].upsert(documents=docs, metadatas=meta, ids=ids)
-        print(f"✅  Upserted {len(docs)} ledgers")
+        print(f"Upserted {len(docs)} ledgers")
 
 
 # ---------------- STOCK ITEMS ---------------- #
 
 def extract_stock_items(masters_root: ET.Element | None = None):
-    print("\n🔄  Extracting Stock Items …")
+    print("\nExtracting Stock Items...")
 
     root  = masters_root if masters_root is not None else fetch_all_masters()
     items = root.findall(".//STOCKITEM") if root is not None else []
@@ -221,31 +221,31 @@ def extract_stock_items(masters_root: ET.Element | None = None):
 
     if docs:
         collections["stock_items"].upsert(documents=docs, metadatas=meta, ids=ids)
-        print(f"✅  Upserted {len(docs)} stock items")
+        print(f"Upserted {len(docs)} stock items")
 
 
 # ---------------- DAY BOOK ---------------- #
 
 def extract_day_book():
-    print("\n🔄  Extracting Day Book …")
+    print("\nExtracting Day Book...")
 
     # Wide date range — covers Demo Company data regardless of year
     from_date = "20200101"
     to_date   = datetime.today().strftime("%Y%m%d")
-    print(f"📅  Date range: {from_date} → {to_date}")
+    print(f"Date range: {from_date} to {to_date}")
 
     extra = f"<SVFROMDATE>{from_date}</SVFROMDATE><SVTODATE>{to_date}</SVTODATE>"
     root  = export_report("Day Book", extra)
 
     if root is None:
-        print("⚠️  Skipping Day Book — no response.")
+        print("Warning: Skipping Day Book -- no response.")
         return
 
     vouchers = root.findall(".//VOUCHER")
     print(f"    Found {len(vouchers)} vouchers")
 
     if not vouchers:
-        print("⚠️  No vouchers found.")
+        print("Warning: No vouchers found.")
         return
 
     docs, metas, ids                  = [], [], []
@@ -337,19 +337,19 @@ def extract_day_book():
 
     if docs:
         collections["day_book"].upsert(documents=docs, metadatas=metas, ids=ids)
-        print(f"✅  Upserted {len(docs)} day_book records")
+        print(f"Upserted {len(docs)} day_book records")
     else:
-        print("⚠️  No day_book entries stored.")
+        print("Warning: No day_book entries stored.")
 
     if sales_docs:
         collections["sales"].upsert(documents=sales_docs, metadatas=sales_meta, ids=sales_ids)
-        print(f"✅  Upserted {len(sales_docs)} sales records")
+        print(f"Upserted {len(sales_docs)} sales records")
 
 
 # ---------------- MAIN ---------------- #
 
 if __name__ == "__main__":
-    print("🚀  Tally → ChromaDB pipeline")
+    print("Tally to ChromaDB pipeline")
     print(f"    Tally URL    : {TALLY_URL}")
     print(f"    Company      : {COMPANY_NAME}")
     print(f"    ChromaDB dir : {CHROMA_DIR}\n")
@@ -357,7 +357,7 @@ if __name__ == "__main__":
     # FIX: Fetch masters once, pass to all three extractors.
     # Avoids 3 redundant HTTP calls and works around Tally routing
     # 'List of Groups' → 'All Masters' silently.
-    print("📦  Fetching all masters (groups + ledgers + stock items) …")
+    print("Fetching all masters (groups + ledgers + stock items)...")
     masters = fetch_all_masters()
 
     if masters is not None:
@@ -371,4 +371,4 @@ if __name__ == "__main__":
     extract_stock_items(masters)
     extract_day_book()
 
-    print("\n✅  Done.")
+    print("\nDone.")
